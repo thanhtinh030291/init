@@ -156,7 +156,8 @@ function sendEmailProvider($user_send, $to_email , $to_name, $subject, $data , $
 }
 // set active value
 function setActive(string $path, $class = 'active') {
-    $requestPath = implode('/', array_slice(Request::segments(), 0, 2));
+    $path = explode('.',$path)[0];
+    $requestPath = implode('.', array_slice(Request::segments(), 1, 2));
     return $requestPath === $path ? $class : "";
 }
 /**

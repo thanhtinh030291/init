@@ -7,7 +7,7 @@
             <h1 class="main-title float-left">{{ __('message.staff_create')}}</h1>
             <ol class="breadcrumb float-right">
                 <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active"><a href="{{ url('admin/admins')}}">{{
+                <li class="breadcrumb-item active"><a href="{{ url('admin/user')}}">{{
                 __('message.staff_management')}}</a></li>
                 <li class="breadcrumb-item active">{{ __('message.staff_create')}}</li>
             </ol>
@@ -37,7 +37,7 @@
                 {{ Form::select('_role', $roles,old('_role'), ['class' => 'select2 form-control', 'multiple' => 'multiple', 'name'=>'_role[]']) }}<br>
                 
 
-                <a class="btn btn-secondary" href="{{url('admin/admins')}}"> {{ __('message.back')}} </a>
+                <a class="btn btn-secondary" href="{{url('admin/user')}}"> {{ __('message.back')}} </a>
                 {{ Form::submit( __('message.save'),['class' => 'btn btn-primary center-block']) }}<br>
                 <!-- End file image -->
                 {{ Form::close() }}

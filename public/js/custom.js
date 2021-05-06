@@ -18,3 +18,8 @@ $('.btn-needs-validation').click(function(event){
     })
     
 });
+
+$(document).ready(function(){
+    $('.select2').select2();
+    $(".active").parent().parent().parent().addClass("menu-open").addClass("menu-is-opening");
+});

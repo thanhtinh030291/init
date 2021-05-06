@@ -47,7 +47,7 @@
                 @foreach($menu->childs as $child)
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{route($child->url)}}" class="nav-link">
+                            <a href="{{route($child->url)}}" class="nav-link {{ setActive($child->url) }}">
                             <i class="far fa-circle nav-icon"></i>
                             <p>{{$child->title}}</p>
                             </a>

@@ -47,17 +47,17 @@ class UserController extends Controller
 			$user->assignRole($request->_role);
 			$data['password'] =$request->password;
 			$data['user'] = $user;
-			sendEmail($user, $data, 'templateEmail.registerAcountTemplate' , 'Thông Tin Đăng Nhập Hệ Thống Claim Assistant');
+			//sendEmail($user, $data, 'templateEmail.registerAcountTemplate' , 'Thông Tin Đăng Nhập Hệ Thống');
 			DB::commit();
 			$request->session()->flash('status', __('message.add_account'));
-			return redirect('/admin/admins/');
+			return redirect('/admin/user/');
 		} catch ( \Exception $e) {
 			Log::error(generateLogMsg($e));
             DB::rollback(); $request->session()->flash(
                 'errorStatus', 
                 __('message.update_fail')
             );
-            return redirect('/admin/admins/')->withInput();
+            return redirect('/admin/user/')->withInput();
         }
 
         // Create the user
@@ -68,7 +68,7 @@ class UserController extends Controller
             flash()->error('Unable to create user.');
         }
 
-        return redirect()->route('userManagerment.index');
+        return redirect()->route('user.index');
     }
 
     public function edit($id)
@@ -84,42 +84,29 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name' => 'bail|required|min:2',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'roles' => 'required|min:1'
+            'email' => 'required|email|unique:users,email,' . $id
         ]);
-
+        $dataNew = $request->except('profile_image', '_method', '_token');
         // Get the user
         $user = User::findOrFail($id);
 
         // Update user
-        $user->fill($request->except('roles', 'permissions', 'password'));
-
-        // check for password change
-        if($request->get('password')) {
-            $user->password = bcrypt($request->get('password'));
-        }
-
+        $user = User::updateOrCreate(['id' => $id], $dataNew);
         // Handle the user roles
-        $this->syncPermissions($request, $user);
+        $user->syncRoles($request->_role);
 
         $user->save();
         flash()->success('User has been updated.');
-        return redirect()->route('userManagement.index');
+        return redirect()->route('user.index');
     }
 
     public function destroy($id)
     {
-        if ( Auth::user()->id == $id ) {
-            flash()->warning('Deletion of currently logged in user is not allowed :(')->important();
-            return redirect()->back();
-        }
-
         if( User::findOrFail($id)->delete() ) {
             flash()->success('User has been deleted');
         } else {
             flash()->success('User not deleted');
         }
-
         return redirect()->back();
     }
 

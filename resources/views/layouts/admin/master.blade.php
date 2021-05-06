@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="{{asset("plugins/summernote/summernote-bs4.min.css?vision=") .$vision }}" rel="stylesheet" type="text/css">
         <!-- aletr sweet -->
         <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/sweetalert2.min.css?vision=') .$vision }}" rel="stylesheet" type="text/css">
+        <!-- select2 -->
+        <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css?vision=') .$vision }}" rel="stylesheet" type="text/css">
         
         @yield('stylesheets')
     </head>
@@ -96,6 +98,10 @@
         <script type='text/javascript' src="{{ asset('plugins/summernote/summernote-bs4.min.js?vision=') .$vision }}"></script>
         <!-- alert sweest -->
         <script type='text/javascript' src="{{ asset('plugins/sweetalert2/sweetalert2.min.js?vision=') .$vision }}"></script>
+        
+        <!-- alert sweest -->
+        <script type='text/javascript' src="{{ asset('plugins/select2/js/select2.min.js?vision=') .$vision }}"></script>
+
         <!-- AdminLTE App -->
         <script type='text/javascript' src="{{ asset('js/adminlte.js?vision=') .$vision }}"></script>
         <!-- AdminLTE for demo purposes -->

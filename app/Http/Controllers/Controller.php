@@ -13,7 +13,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function __construct()
-    {
+    { 
         $menus = Menu::where('parent_id', '=', 0)->orderBy('order')->get();
         $allMenus = Menu::pluck('title','id')->all();
         $vision = 6;

@@ -14,7 +14,7 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-primary pull-right" href="{{url('admin/admins/create')}}">
+        <a class="btn btn-primary pull-right" href="{{url('admin/user/create')}}">
             {{ __('message.create_staff')}}
         </a>
     </div>
@@ -80,10 +80,10 @@
                                 <td>{{$user->created_at}}</td>
                                 <td class='text-center'>
                                     <!-- control -->
-                                    <a class="btn btn-primary" href='{{url("admin/user/$user->id")}}'>{{__('message.view')}}</a>
                                     <a class="btn btn-success" href='{{url("admin/user/$user->id/edit")}}'>{{__('message.edit')}}</a>
-                                    <button type="button" class="btn btn-danger btn-delete" data-url="{{ route('user.destroy', $user->id) }}"
-                                        data-toggle="modal" data-target="#deleteConfirmModal"> {{__('message.delete')}}</button>
+                                    {{ Form::open(array('url' => '/admin/user/'.$user->id, 'method' => 'DELETE' ,'class'=>'action_form','class' =>'needs-validation')) }}
+                                        {!! Form::button('Delete',['class' => 'btn btn-danger btn-needs-validation btn-delete']) !!}
+                                    {{ Form::close() }}
                                 </td>
                             </tr>
                         </tbody>
