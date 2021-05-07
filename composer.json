@@ -12,13 +12,11 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laracasts/flash": "^3.2",
         "laravel/framework": "^8.12",
-        "laravel/jetstream": "^2.3",
-        "laravel/sanctum": "^2.6",
+        "laravel/passport": "^10.1",
         "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.2",
         "laravelcollective/html": "^6.2",
-        "livewire/livewire": "^2.0",
-        "spatie/laravel-permission": "^4.0",
-        "yajra/laravel-oci8": "^8.4"
+        "spatie/laravel-permission": "^4.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -63,7 +61,8 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "platform-check": false
     },
     "minimum-stability": "dev",
     "prefer-stable": true

@@ -22,6 +22,8 @@
         <link rel="stylesheet" href="{{asset("plugins/icheck-bootstrap/icheck-bootstrap.min.css?vision=") .$vision }}" rel="stylesheet" type="text/css">
         <!-- JQVMap -->
         <link rel="stylesheet" href="{{asset("plugins/jqvmap/jqvmap.min.css?vision=") .$vision }}" rel="stylesheet" type="text/css">
+        <!-- bottraps style -->
+        <link rel="stylesheet" href="{{asset("css/bootstrap.css?vision=") .$vision }}" rel="stylesheet" type="text/css">
         <!-- Theme style -->
         <link rel="stylesheet" href="{{asset("css/adminlte.min.css?vision=") .$vision }}" rel="stylesheet" type="text/css">
         <!-- overlayScrollbars -->

@@ -14,7 +14,7 @@ class HbsPlanConfigController extends Controller
     //use Authorizable;
     public function __construct()
     {
-        //$this->authorizeResource(Product::class);
+        //$this->authorizeResource(PlanHbsConfig::class);
         parent::__construct();
     }
     /**
@@ -25,15 +25,18 @@ class HbsPlanConfigController extends Controller
     public function index(Request $request)
     {
         $data['search_params'] = [
-            'plan_desc' => $request->get('plan_desc')
+            'plan_desc' => $request->get('plan_desc'),
+            'plan_id' => $request->get('plan_id'),
+            'rev_no' => $request->get('rev_no'),
+            'ready' => $request->get('ready'),
         ];
-        $Product = PlanHbsConfig::findByParams($data['search_params'])->orderBy('id', 'desc');
+        $PlanHbsConfig = PlanHbsConfig::findByParams($data['search_params'])->orderBy('id', 'desc');
         $data['admin_list'] = User::getListIncharge();
         //pagination result
         $data['limit_list'] = config('constants.limit_list');
         $data['limit'] = $request->get('limit');
         $per_page = !empty($data['limit']) ? $data['limit'] : Arr::first($data['limit_list']);
-        $data['data']  = $Product->paginate($per_page);
+        $data['data']  = $PlanHbsConfig->paginate($per_page);
         
         return view('PlanHbsManagement.index', $data);
     }
@@ -54,17 +57,17 @@ class HbsPlanConfigController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(reasonInjectRequest $request)
+    public function store(Request $request)
     {
         $userId = Auth::User()->id;
         $data = $request->except([]);
         $data['created_user'] = $userId;
         $data['updated_user'] = $userId;
 
-        Product::create($data);
+        PlanHbsConfig::create($data);
         $request->session()->flash('status', __('message.reason_inject_create_success')); 
         
-        return redirect('/admin/product');
+        return redirect('/admin/PlanHbsConfig');
     }
 
     /**
@@ -73,9 +76,9 @@ class HbsPlanConfigController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show(PlanHbsConfig $PlanHbsConfig)
     {
-        $data = $product;
+        $data = $PlanHbsConfig;
         $userCreated = $data->userCreated->name;
         $userUpdated = $data->userUpdated->name;
         return view('PlanHbsManagement.detail', compact('data', 'userCreated', 'userUpdated'));
@@ -87,10 +90,20 @@ class HbsPlanConfigController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $data = $product;
-        return view('PlanHbsManagement.edit', compact('data'));
+        $data = PlanHbsConfig::findOrFail($id);
+        $dirStorage = config('constants.srcStorage');
+        $dataImage = [];
+        $previewConfig = [];
+        if($data->url){
+            $dataImage[] = "<img class='kv-preview-data file-preview-image' src='" . asset(config('constants.srcStorage').'/'.$data->url) . "'>";
+            $previewConfig[]['caption'] = $data->url;
+            $previewConfig[]['width'] = "120px";
+            $previewConfig[]['url'] = "/admin/hbsplan/removeImage";
+            $previewConfig[]['key'] = $data->url;
+        }
+        return view('PlanHbsManagement.edit', compact('data','dataImage', 'previewConfig'));
     }
 
     /**
@@ -100,15 +113,17 @@ class HbsPlanConfigController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(reasonInjectRequest $request, Product $product)
+    public function update(Request $request, $id)
     {
         $data = $request->except([]);
-        $userId = Auth::User()->id;
-        $data['updated_user'] = $userId;
-        Product::updateOrCreate(['id' => $product->id], $data);
-
+        $dataOld = PlanHbsConfig::findOrFail($id);
+        
+        if ($request->_url_file) {
+            $data['url'] = saveFile($request->_url_file[0], config('constants.srcUpload'),$dataOld->url);
+        }
+        PlanHbsConfig::updateOrCreate(['id' => $id], $data);
         $request->session()->flash('status', __('message.reason_inject_update_success')); 
-        return redirect('/admin/product');
+        return redirect('/admin/hbsplan');
     }
 
     /**
@@ -117,10 +132,10 @@ class HbsPlanConfigController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy(PlanHbsConfig $PlanHbsConfig)
     {
-        $data = $product;
+        $data = $PlanHbsConfig;
         $data->delete();
-        return redirect('/admin/product')->with('status', __('message.reason_inject_delete_success'));
+        return redirect('/admin/PlanHbsConfig')->with('status', __('message.reason_inject_delete_success'));
     }
 }
