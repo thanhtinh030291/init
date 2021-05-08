@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
-use Auth;
 use App\Models\PlanHbsConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 
 
 class HbsPlanConfigController extends Controller
