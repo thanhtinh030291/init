@@ -1,0 +1,11 @@
+{extends file="public/Master.html"}
+{block name=body}
+    {include file="public/Header.html"}
+    <style>
+        body { background-color: #EEE; }
+    </style>
+    {include file="changepassword/Form.html"}
+    {if strlen($errorAlert) > 0}
+        {include file="changepassword/Error.html"}
+    {/if}
+{/block}

@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {{ Form::label('plan_desc', 'plan desc', ['class' => 'labelas']) }}
-                            {{ Form::text('plan_desc', $search_params['plan_desc'], ['class' => 'form-control']) }}
+                            {{ Form::text('plan_desc', data_get($search_params,'plan_desc'), ['class' => 'form-control']) }}
 
                             {{ Form::label('Rev_No', 'Rev No', ['class' => 'labelas']) }}
                             {{ Form::text('rev_no', $search_params['rev_no'], ['class' => 'form-control']) }}
@@ -31,8 +31,13 @@
                             {{ Form::text('plan_id', $search_params['plan_id'], ['class' => 'form-control']) }}
 
                             {{ Form::label('ready', 'Ready', ['class' => 'labelas']) }}
-                            {{ Form::select('ready', [0 => 'No' , 1 => 'Yes'], $search_params['ready'], ['class' => 'form-control']) }}
+                            {{ Form::select('ready', [0 => 'No' , 1 => 'Yes'], $search_params['ready'], ['class' => 'form-control' ,  'placeholder' => '']) }}
                             
+                            {{ Form::label('ready', 'Ready', ['class' => 'labelas']) }}
+                            {{ Form::select('ready', [0 => 'No' , 1 => 'Yes'], $search_params['ready'], ['class' => 'form-control' ,  'placeholder' => '']) }}
+
+                            {{ Form::label('Company', 'Company', ['class' => 'labelas']) }}
+                            {{ Form::select('company', config('constants.company'), data_get($search_params,'company'), ['class' => 'form-control' ,  'placeholder' => '']) }}
                         </div>
                         
                     </div>
@@ -61,6 +66,7 @@
                                 <th>Rev No</th>
                                 <th>{{ __('message.name')}}</th>
                                 <th>Ready</th>
+                                <th>Company</th>
                                 <th>{{ __('message.date_created')}}</th>
                                 <th>{{ __('message.date_updated')}}</th>
                                 <th class='text-center control_btn'>{{ 
@@ -77,6 +83,7 @@
                                 <td>{{ $value->rev_no }}</td>
                                 <td>{{ $value->plan_desc }}</td>
                                 <td>{{ $value->ready == 1 ? 'Yes' : 'No' }}</td>
+                                <td>{{ $value->company }}</td>
                                 <td>{{ $value->created_at }}</td>
                                 <td>{{ $value->updated_at }}</td>
                                 <td class='text-center'>

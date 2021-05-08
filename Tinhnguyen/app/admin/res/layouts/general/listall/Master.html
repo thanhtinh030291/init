@@ -1,0 +1,23 @@
+{extends file="public/Master.html"}
+{block name=body}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            {$res->i18n->listAllItems($table["plural`$smarty.session.lzalanguage`"])}
+        </h1>
+    </div>
+</div>
+{include file="general/listall/SelectFilter.html"}
+{include file="general/listall/DataTable.html"}
+{if (!isset($options->edit) || $options->edit) && ($permission & EDIT_LEVEL) === EDIT_LEVEL}
+    {include file="general/listall/MassEdit.html"}
+    {include file="general/listall/MassDelete.html"}
+{/if}
+{if (!isset($options->add) || $options->add) && ($permission & ADD_LEVEL) === ADD_LEVEL}
+    {include file="general/listall/Import.html"}
+{/if}
+{include file="general/listall/Export.html"}
+{include file="general/listall/ExportAll.html"}
+{include file="general/listall/AddFilter.html"}
+{include file="general/listall/ManageFilter.html"}
+{/block}

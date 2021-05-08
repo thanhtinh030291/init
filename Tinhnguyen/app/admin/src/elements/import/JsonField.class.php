@@ -1,0 +1,47 @@
+<?php
+
+namespace Lza\App\Admin\Elements\Import;
+
+
+use Lza\App\Admin\Elements\ImportInput;
+use Lza\LazyAdmin\Form\TextBox;
+
+/**
+ * @author Le Vinh Nghiem (le.vinhnghiem@gmail.com)
+ */
+class JsonField extends TextBox
+{
+    use ImportInput;
+
+    /**
+     * Retreive the field value
+     *
+     * @throws
+     */
+    public function getValue()
+    {
+        return $this->data->value !== null ? $this->encryptor->jsonDecode($this->data->value) : null;
+    }
+
+    /**
+     * Validate the field with the more advanced rules than the field itself
+     *
+     * @throws
+     */
+    protected function advancedValidate($metadata, $value)
+    {
+        return $this->validateMandatory($metadata, $value)
+            && $this->validateUnique($metadata, $value)
+            && $this->validateJson($metadata, $value);
+    }
+
+    /**
+     * Retrieve the client side script of the field
+     *
+     * @throws
+     */
+    public function getContentScript()
+    {
+        return strlen($this->data->value) === 0 ? '' : parent::getContentScript();
+    }
+}

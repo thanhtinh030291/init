@@ -1,0 +1,47 @@
+{extends file="user/public/Master.html"}
+{block name=body}
+<div class="login-panel panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{$res->i18n->pleaseSignIn}</h3>
+    </div>
+    <div class="panel-body">
+        <form method="post" id="lza-form" accept-charset="utf-8" show="loading">
+            <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+            <fieldset>
+                <div class="form-group">
+                    <input class="form-control" autofocus
+                           placeholder="{$res->i18n->username}"
+                           name="username" type="text">
+                </div>
+                <div class="form-group">
+                    <input class="form-control"
+                           placeholder="{$res->i18n->password}" value=""
+                           name="password" type="password">
+                </div>
+                <!--
+                <div class="checkbox">
+                    <label>
+                        <input name="remember" type="checkbox" bootstrap="bootstrap"
+                               value="Remember Me">Remember Me
+                    </label>
+                </div>
+                -->
+                <!-- Change this to a button or input when using this as a form -->
+                <button type="submit" class="btn btn-lg btn-success btn-block"
+                        name="action" id="action" value="Login">
+                    {$res->i18n->login}
+                </button>
+            </fieldset>
+            <div class="form-group" style="text-align: center">
+                <br />
+                <a href="{$regionPath}/forget-password">
+                    <i class="fa fa-repeat fa-fw"></i>
+                    <span class="masked">
+                        {$res->i18n->forgetPassword}
+                    </span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}

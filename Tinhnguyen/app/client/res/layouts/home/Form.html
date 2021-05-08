@@ -1,0 +1,187 @@
+<div id="gain_content" style="display: inline;">
+    <form id="lza-form" method="post" class="p_search">
+        <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+        <div class="col-xs-12 bold" style="margin: 1.5em 0 0 0;">{#search_hint#}</div>
+        <div class="col-xs-6">
+            {#type#}<br>
+            <select id="type" name="type" class="form-control" required="required">
+                <option></option>
+                <option value="gop">{#gop#}</option>
+                <option value="view">{#view#}</option>
+                <option value="redirect">{#redirect#}</option>
+            </select>
+        </div>
+        <div class="col-xs-6 hidden" id="company-holder">
+            {#company#}<br>
+            <select id="company" name="company" class="form-control" style="width: 100%" required="required">
+                <option></option>
+                <option value="pcv">{#pcv#}</option>
+                <option value="fubon">{#fubon#}</option>
+                <option value="cathay">{#cathay#}</option>
+            </select>
+        </div>
+        <div class="col-xs-6 hidden" id="pocy-no-holder">
+            {#policy_no#}<br>
+            <input id="pocy-no" name="pocy_no" type="text" placeholder="XXXXXXXX" required="required"
+                   class="form-control" style="width: 100%" value="{$pocyNo}">
+        </div>
+        <div class="col-xs-6 hidden" id="mbr-no-holder">
+            {#mbr_no#}<br>
+            <input id="mbr-no" name="mbr_no" type="text" placeholder="XXXXXXXX" required="required"
+                   class="form-control" style="width: 100%" value="{$mbrNo}">
+        </div>
+        <div class="col-xs-6 hidden" id="dob-holder">
+            {#dob#}<br>
+            <input id="dob" name="dob" type="text" placeholder="{$dateFormat}"
+                   class="form-control" style="width: 100%" required="" value="{$dob}">
+        </div>
+        <div class="col-xs-6 hidden" id="mbr-name-holder">
+            {#mbr_name#}<br>
+            <input id="mbr-name" name="mbr_name" type="text" placeholder="XXXXXXXX" required="required"
+                   class="form-control" style="width: 100%" value="{$mbrName}">
+        </div>
+        <div class="col-xs-12" style="text-align: right; margin: 1.5em 0;">
+            <input type="hidden" id="qr-holder" />
+            <button type="button" class="btn btn-sm btn-primary qrcode-reader hidden" id="qrcode-reader"
+                    data-qrr-target="#qr-holder" data-qrr-audio-feedback="false">
+                Read QR Code
+            </button>
+            <button class="btn btn-sm btn-primary hidden" value="search" id="search" name="action" type="submit">
+                {#search_button#}
+            </button>
+        </div>
+        <br class="clr">
+    </form>
+    {include file="public/Contact.html"}
+</div>
+<script type="text/javascript">
+    $.fn.select2.defaults.set( "theme", "bootstrap" );
+    $('#company').val('{$company}');
+    $('#type').val('{$type}');
+    $('#company').select2({ placeholder: '{#company#}' });
+    $('#type').select2({ placeholder: '{#type#}' });
+    $("#dob").datetimepicker(
+    {
+        format: '{DATE_FORMAT}',
+        timepicker:false
+    });
+    $('#company').change(function()
+    {
+        var company = $(this).val();
+        switchCompany(company);
+    });
+    $('#type').change(function()
+    {
+        if (this.value === 'redirect')
+        {
+            location.href = '{WEBSITE_ROOT}home?action=Redirect&{$tokenName}_token={$tokenValue}';
+        }
+        $("#company-holder").removeClass('hidden');
+        $("#qrcode-reader").removeClass('hidden');
+        $("#search").removeClass('hidden');
+    });
+    switchCompany($('#company').val());
+    function switchCompany(company)
+    {
+        if (company === 'pcv')
+        {
+            $('#company-holder').removeClass('hidden');
+            $("#qrcode-reader").removeClass('hidden');
+            $("#search").removeClass('hidden');
+            $('#pocy-no-holder').addClass('hidden');
+            $('#pocy-no').val('hidden');
+            $('#mbr-no-holder').removeClass('hidden');
+            $('#mbr-no').val('{$mbrNo}');
+            $('#mbr-name-holder').addClass('hidden');
+            $('#mbr-name').val('hidden');
+            $('#dob-holder').removeClass('hidden');
+            $('#dob').val('{$dob}');
+        }
+        else if (company === 'cathay')
+        {
+            $('#company-holder').removeClass('hidden');
+            $("#qrcode-reader").removeClass('hidden');
+            $("#search").removeClass('hidden');
+            $('#pocy-no-holder').removeClass('hidden');
+            $('#pocy-no').val('{$pocyNo}');
+            $('#mbr-no-holder').addClass('hidden');
+            $('#mbr-no').val('hidden');
+            $('#mbr-name-holder').removeClass('hidden');
+            $('#mbr-name').val('{$mbrName}');
+            $('#dob-holder').addClass('hidden');
+            $('#dob').val('hidden');
+        }
+        else if (company === 'fubon')
+        {
+            $('#company-holder').removeClass('hidden');
+            $("#qrcode-reader").removeClass('hidden');
+            $("#search").removeClass('hidden');
+            $('#pocy-no-holder').removeClass('hidden');
+            $('#pocy-no').val('{$pocyNo}');
+            $('#mbr-no-holder').addClass('hidden');
+            $('#mbr-no').val('hidden');
+            $('#mbr-name-holder').removeClass('hidden');
+            $('#mbr-name').val('{$mbrName}');
+            $('#dob-holder').removeClass('hidden');
+            $('#dob').val('{$dob}');
+        }
+        else
+        {
+            $('#pocy-no-holder').addClass('hidden');
+            $('#pocy-no').val('hidden');
+            $('#mbr-no-holder').addClass('hidden');
+            $('#mbr-no').val('{$mbrNo}');
+            $('#mbr-name-holder').addClass('hidden');
+            $('#mbr-name').val('hidden');
+            $('#dob-holder').addClass('hidden');
+            $('#dob').val('{$dob}');
+        }
+    }
+    $(function()
+    {
+        // overriding path of JS script and audio
+        $.qrCodeReader.jsQRpath = "{WEBSITE_ROOT}libraries/qrcodereader/dist/js/jsQR/jsQR.min.js";
+        $.qrCodeReader.beepPath = "{WEBSITE_ROOT}libraries/qrcodereader/dist/audio/beep.mp3";
+
+        // bind all elements of a given class
+        $("#qrcode-reader").qrCodeReader(
+        {
+            callback: function(qrcode)
+            {
+                if (qrcode)
+                {
+                    var data = JSON.parse(qrcode);
+                    if (typeof(data) === 'object' && data !== null)
+                    {
+                        if (data.hasOwnProperty('company'))
+                        {
+                            $('#company').val(data['company']).trigger('change');;
+                        }
+
+                        if (data.hasOwnProperty('pocy_no'))
+                        {
+                            $('#pocy-no').val(data['pocy_no']);
+                        }
+
+                        if (data.hasOwnProperty('mbr_no'))
+                        {
+                            $('#mbr-no').val(data['mbr_no']);
+                        }
+
+                        if (data.hasOwnProperty('mbr_name'))
+                        {
+                            $('#mbr-name').val(data['mbr_name']);
+                        }
+
+                        if (data.hasOwnProperty('dob'))
+                        {
+                            $('#dob').val(data['dob']);
+                        }
+
+                        $('#search').click();
+                    }
+                }
+            }
+        });
+    });
+</script>

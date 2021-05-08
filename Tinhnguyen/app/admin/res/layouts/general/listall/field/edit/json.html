@@ -1,0 +1,13 @@
+<span><b>{$label}</b></span>
+<input type="checkbox" class="hide" id="updates-{$id}" name="updates[]" value="{$id}" />
+<div class="form-group input-group">
+    <span class="input-group-addon">
+        <input id="enable-{$id}" type="checkbox" onclick="javascript:toggle('{$id}');" />
+    </span>
+    <textarea disabled="disabled" class="form-control "
+              id="{$id}" name="{$name}"
+              placeholder="{$placeholder}" rows="9"></textarea>
+    <span class="input-group-addon">
+        <i class="fa fa-font"></i>
+    </span>
+</div>

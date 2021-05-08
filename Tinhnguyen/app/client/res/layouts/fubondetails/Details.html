@@ -1,0 +1,244 @@
+<div id="policy_search_detail" class="hidden-xs col-xs-12 col-sm-9">
+    <div>
+        <img src="{CLIENT_RES_PATH}images/logo.png"
+             class="visible-print img-header-print" style="float: left;">
+        <div class="clr"></div>
+    </div>
+    <div id="pd{$member['mbr_no']}" class="pol_detail">
+        <div class="phead active">
+            <span class="hidden-xs print-this">{#information#}</span>
+            <span class="visible-xs-inline hidden-print"
+                  style="cursor:pointer; margin-right: 0.5em;"
+                  onclick="policyBackToList();">
+                <span class="glyphicon glyphicon-arrow-left"></span>
+            </span>
+            <span class="hname visible-xs-inline hidden-print">
+                {$member['mbr_last_name']} {$member['mbr_first_name']}
+            </span>
+            <span class="status">
+                <span class="hname hidden-xs hidden-print"
+                      style="margin-right: 15px;">
+                    {$member['mbr_last_name']} {$member['mbr_first_name']}
+                </span>
+            </span>
+            <br class="clr">
+        </div>
+        <div class="pdetail">
+            <div class="col-xs-6 col-sm-4 col-md-3">
+                {#insurance_company#}:
+            </div>
+            <div class="col-xs-6 col-sm-8 col-md-9 bold">
+                {strtoupper($res->setting->fubon)}
+            </div>
+        </div>
+        <div class="pdetail">
+            <div class="col-xs-6 col-sm-4 col-md-3">
+                {#plan_desc#}:
+            </div>
+            <div class="col-xs-6 col-sm-8 col-md-9">
+                {implode('<br />', $member['plan_desc'])}
+            </div>
+        </div>
+        <div class="pdetail">
+            <div class="col-xs-6 col-sm-4 col-md-3">
+                {#insured_name#}:
+            </div>
+            <div class="col-xs-6 col-sm-8 col-md-9">
+                {$member['mbr_last_name']} {$member['mbr_first_name']}
+            </div>
+        </div>
+        <div class="pdetail">
+            <div class="col-xs-6 col-sm-4 col-md-3">
+                {#policy_no#}:
+            </div>
+            <div class="col-xs-6 col-sm-8 col-md-9">
+                {$member['pocy_no']}
+            </div>
+        </div>
+        <div class="pdetail">
+            <div class="col-xs-6 col-sm-4 col-md-3">
+                {#payment_mode#}:
+            </div>
+            <div class="col-xs-6 col-sm-8 col-md-9">
+                {$res->i18n->$member['payment_mode']}
+            </div>
+        </div>
+        {if (strlen($member['memb_status']) > 0)}
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">{#memb_status#}:</div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$res->i18n->$member['memb_status']}
+                    {if (strlen($member['memb_status_notes']) > 0)}
+                        <br />{$member['memb_status_notes']}
+                    {/if}
+                </div>
+            </div>
+        {/if}
+        {if $member['memb_status'] !== 'no_gop_direct_billing'}
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#memb_eff_date#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$member['memb_eff_date']}
+                </div>
+            </div>
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#memb_exp_date#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$member['memb_exp_date']}
+                </div>
+            </div>
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#term_date#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$member['term_date']}
+                </div>
+            </div>
+            {if count($member['insured_periods']) > 1}
+                <div class="pdetail">
+                    <div class="col-xs-6 col-sm-4 col-md-3">
+                        {#insured_periods#}:
+                    </div>
+                    <div class="col-xs-6 col-sm-8 col-md-9">
+                        {implode('<br />', $member['insured_periods'])}
+                    </div>
+                </div>
+            {else}
+                <div class="pdetail">
+                    <div class="col-xs-6 col-sm-4 col-md-3">
+                        {#first_effective_date#}:
+                    </div>
+                    <div class="col-xs-6 col-sm-8 col-md-9">
+                        {$member['min_memb_eff_date']}
+                    </div>
+                </div>
+            {/if}
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#wait_period#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$res->i18n->$member['wait_period']}
+                </div>
+            </div>
+            {if (strlen($member['reinst_date']) > 0)}
+                <div class="pdetail">
+                    <div class="col-xs-6 col-sm-4 col-md-3">
+                        {#reinstate_date#}:
+                    </div>
+                    <div class="col-xs-6 col-sm-8 col-md-9">
+                        {$member['reinst_date']}
+                    </div>
+                </div>
+            {/if}
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#memb_event#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    <span style="color: red">
+                        {nl2br($member['memb_event'])}
+                    </span>
+                </div>
+            </div>
+        {/if}
+        {if strlen($member['db_ref_no']) > 0}
+            <div class="pdetail">
+                <div class="col-xs-6 col-sm-4 col-md-3">
+                    {#db_ref_no#}:
+                </div>
+                <div class="col-xs-6 col-sm-8 col-md-9">
+                    {$member['db_ref_no']}
+                </div>
+            </div>
+        {/if}
+        <div class="hidden-print icon-print">
+            <span onclick="window.print();">
+                <img src="{CLIENT_RES_PATH}images/print_big.png">
+                {#print_policy#}
+            </span>
+        </div>
+        <hr style="margin: 1em; border: solid 0.1em #e7e7e7;">
+    </div>
+    {if !$finish}
+        <form id="lza-form" method="post" class="">
+            <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+            <span class="col-xs-12 bold" style="text-align: center;">
+                {#gop_message#}
+            </span>
+            {if $canGop && $smarty.session.search.type === 'gop' && count($smarty.session.search.gop_amounts) > 0}
+                <div class="col-xs-12" style="text-align: center; margin: 1.5em 0;">
+                    <button class="btn btn-sm btn-success"
+                            value="confirm" name="action" type="submit">
+                        {#confirm_gop#}
+                    </button>
+                    <button class="btn btn-sm btn-danger"
+                            value="cancel" name="action" type="submit">
+                        {#cancel_gop#}
+                    </button>
+                </div>
+            {/if}
+        </form>
+    {/if}
+</div>
+<div class="col-xs-12">
+    {if count($member['limits']) > 0 && $member['memb_status'] === 'approved' && $member['memb_status_note'] == ''}
+        <h3>{#benefit_info#}</h3>
+        {foreach $member['limits'] as $plan => $planLimits}
+            <h4>{$plan}</h4>
+            <table class="table table-striped table-bordered table-hover text-center benefit-info-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">{#benefit#}</th>
+                        <th class="text-center">{#ben_limit#}</th>
+                        <th class="text-center">{#ben_used#}</th>
+                        <th class="text-center">{#ben_remained#}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {assign var=i value=0}
+                    {foreach $planLimits as $title => $limits}
+                        {$i = $i + 1}
+                        {assign var=j value=0}
+                        {foreach $limitTypes as $limitType}
+                            {if $limits["`$limitType`_limit"] !== null}
+                                {$j = $j + 1}
+                                <tr>
+                                    <th class="text-left">{$i}.{$j} - {$res->i18n->benLimitFor($res->i18n->$limitType, $title)}</th>
+                                    <td class="text-right">
+                                        {if $limits["`$limitType`_limit"] - $limits["`$limitType`_used"] < 0}
+                                            <strong class="text-success">{#as_charged#}</strong>
+                                        {else}
+                                            {number_format($limits["`$limitType`_limit"])}
+                                            {if strpos($limitType, 'amt') !== false}đ{/if}
+                                        {/if}
+                                    </td>
+                                    <td class="text-right">
+                                        {number_format($limits["`$limitType`_used"])}
+                                        {if strpos($limitType, 'amt') !== false}đ{/if}
+                                    </td>
+                                    <td class="text-right">
+                                        {if strpos($limitType, '_dis_') === false && strpos($limitType, '_vis') === false}
+                                            {if $limits["`$limitType`_limit"] - $limits["`$limitType`_used"] < 0}
+                                                <strong class="text-success">{#as_charged#}</strong>
+                                            {else}
+                                                {number_format($limits["`$limitType`_limit"] - $limits["`$limitType`_used"])}
+                                                {if strpos($limitType, 'amt') !== false}đ{/if}
+                                            {/if}
+                                        {/if}
+                                    </td>
+                                </tr>
+                            {/if}
+                        {/foreach}
+                    {/foreach}
+                </tbody>
+            </table>
+        {/foreach}
+        <script type="text/javascript">$('.benefit-info-table').DataTable();</script>
+    {/if}
+</div>

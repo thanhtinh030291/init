@@ -472,3 +472,12 @@ function getTokenMfile(){
     }
     return  $setting->token_mfile;
 }
+
+function hashpass($data, $recursive = 2)
+{
+    $KEY = "!@#$%^&*93800988";
+    $data = hash_hmac('SHA256', $data, $KEY);
+    $data = hash_hmac('SHA256', $data, $KEY);
+    return  $data ;
+}
+

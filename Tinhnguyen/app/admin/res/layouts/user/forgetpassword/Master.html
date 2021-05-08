@@ -1,0 +1,37 @@
+{extends file="user/public/Master.html"}
+{block name=body}
+<div class="login-panel panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {$res->i18n->resetPassword}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <form method="post" id="lza-form" accept-charset="utf-8" show="loading">
+            <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+            <fieldset>
+                <div class="form-group">
+                    <input class="form-control email" autofocus
+                           placeholder="{$res->i18n->email}"
+                           name="email" type="email">
+                </div>
+                <button type="submit"
+                        name="action" id="action"
+                        value="ForgetPassword"
+                        class="btn btn-lg btn-danger btn-block">
+                    {$res->i18n->resetPassword}
+                </button>
+                <div class="form-group" style="text-align: center">
+                    <br />
+                    <a href="{$regionPath}/login">
+                        <i class="fa fa-sign-in fa-fw"></i>
+                        <span class="masked">
+                            {$res->i18n->login}
+                        </span>
+                    </a>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+{/block}

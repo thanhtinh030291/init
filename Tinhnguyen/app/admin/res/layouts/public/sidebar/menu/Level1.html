@@ -1,0 +1,22 @@
+{if count($item1['children']) > 0}
+    <ul class="nav nav-second-level">
+        {foreach $item1['children'] as $item2}
+            <li>
+                <a href="#">
+                    <i class="fa fa-{if isset($item2['icon']) && strlen($item2['icon']) > 0}{$item2['icon']}{else}table{/if} fa-fw"></i>
+                    <span class="">
+                        {$item2["plural`$smarty.session.lzalanguage`"]}
+                        <span class="fa arrow"></span>
+                    </span>
+                </a>
+                {include file="public/sidebar/menu/Level2Children.html"}
+            </li>
+        {/foreach}
+    </ul>
+{elseif count($item1['views']) > 0}
+    <ul class="nav nav-second-level">
+        {foreach $item1['views'] as $item2}
+            <li>{include file="public/sidebar/menu/Level2View.html"}</li>
+        {/foreach}
+    </ul>
+{/if}

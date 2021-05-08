@@ -1,0 +1,19 @@
+<form id="{$id}" name="{$name}" method="post" accept-charset="utf-8">
+    <div class="modal-body">
+        <div class="row" style="padding: 20px 20px 20px 20px">
+            <h5 class="text-primary" style="text-align: center">
+                {$infoLabel}
+            </h5>
+            {$inputs}
+            <h5 class="text-danger" style="text-align: center">
+                {$warningLabel}
+            </h5>
+        </div>
+    </div>
+    <div class="modal-footer">
+        {$updateButton}&nbsp;
+        <button class="btn btn-outline btn-default" data-dismiss="modal">
+            {$cancelLabel}
+        </button>
+    </div>
+</form>

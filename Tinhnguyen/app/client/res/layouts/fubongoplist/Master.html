@@ -1,0 +1,24 @@
+{extends file="public/Master.html"}
+{block name=body}
+    {include file="public/Header.html"}
+    {include file="fubongoplist/Form.html"}
+    {include file="public/Contact.html"}
+    <div id="benefit-info" class="col-xs-12 col-lg-12 col-md-12 col-sm-12"></div>
+    <div id="gop-info" class="col-xs-12 col-lg-12 col-md-12 col-sm-12"></div>
+    <div id="claim-info" class="col-xs-12 col-lg-12 col-md-12 col-sm-12"></div>
+    <form method="post" id="export-db-form" accept-charset="utf-8" show="loading">
+        <div class="col-xs-12 col-lg-12 col-md-12 col-sm-12">
+            <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+            <button type=submit class="btn btn-sm btn-primary pull-right" name="action" value="Export">{#export_db#}</button>
+        </div>
+    </form>
+    <div id="call-info" class="col-xs-12 col-lg-12 col-md-12 col-sm-12"></div>
+    <div id="error-info"></div>
+    <input type="hidden" id="is-pcv" value="{if $isPcv}yes{else}no{/if}">
+    <script type="text/javascript" src="resources/scripts/gop_list.js"></script>
+    <script type="text/javascript" src="resources/scripts/claim_list.js"></script>
+    {include file="public/Loading.html"}
+    {if strlen($errorAlert) > 0}
+        {include file="public/Error.html"}
+    {/if}
+{/block}

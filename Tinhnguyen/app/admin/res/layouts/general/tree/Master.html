@@ -1,0 +1,92 @@
+{extends file="public/Master.html"}
+{block name=body}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            {$res->i18n->showItemTree($table["plural`$smarty.session.lzalanguage`"])}
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-tree"></i>
+                {$table["plural`$smarty.session.lzalanguage`"]}
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="tree"
+                             data-url="{$regionPath}/{$res->env->module}/tree/showall?{$smarty.session.token_name}_token={$smarty.session.token_value}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function()
+{
+    $('#tree').tree(
+    {
+        dragAndDrop: true,
+        autoEscape: false,
+        onCanSelectNode: function(node)
+        {
+            return node.id != null;
+        },
+        onCanMove: function(node)
+        {
+            $('.btn').popover({ html : true });
+            return node.can_move;
+        },
+        onCanMoveTo: function(source, target, position)
+        {
+            return target.can_move_to;
+        },
+        onLoadFailed: function(response)
+        {
+            $('#tree').tree(
+                'loadDataFromUrl',
+                "{$regionPath}/{$res->env->module}/tree/showall?{$smarty.session.token_name}_token={$smarty.session.token_value}"
+            );
+        }
+    });
+    $('#tree').on('tree.move', function(event)
+    {
+        console.log('moved_node', event.move_info.moved_node.id);
+        console.log('target_node', event.move_info.target_node.id);
+        console.log('position', event.move_info.position);
+        console.log('previous_parent', event.move_info.previous_parent.id);
+        $.ajax
+        ({
+            type: "POST",
+            url: "{$regionPath}/{$res->env->module}/tree?{$smarty.session.token_name}_token={$smarty.session.token_value}&action=MoveItem",
+            data:
+            {
+                node: event.move_info.moved_node.id,
+                target: event.move_info.target_node.id,
+                position: event.move_info.position,
+                previous_parent: event.move_info.previous_parent.id
+            },
+            success: function(msg)
+            {
+                $('#tree').tree(
+                    'loadDataFromUrl',
+                    "{$regionPath}/{$res->env->module}/tree/showall?{$smarty.session.token_name}_token={$smarty.session.token_value}"
+                );
+            },
+            error: function(msg)
+            {
+                alert(msg);
+            }
+        });
+    });
+    $('#tree').on('tree.init', function(e)
+    {
+        $('.btn').popover({ html : true });
+    });
+});
+</script>
+{/block}

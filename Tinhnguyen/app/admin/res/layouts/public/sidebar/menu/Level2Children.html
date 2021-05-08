@@ -1,0 +1,36 @@
+{if count($item2['views']) > 0}
+    <ul class="nav nav-third-level">
+        {foreach $item2['views'] as $item3}
+            <li>
+                {if is_array($item3)}
+                    <a href="{$regionPath}/{chain_case($item2['id'])}/{$item3['uri']}">
+                        <i class="fa fa-gear fa-fw"></i>
+                        {$item3['text']}
+                    </a>
+                {else}
+                    <a href="{$regionPath}/{chain_case($item2['id'])}/{$item3}">
+                        {if $item3 == 'list'}
+                            <i class="fa fa-list fa-fw"></i>
+                            {$res->i18n->listAllItems($item2["plural`$smarty.session.lzalanguage`"])}
+                        {elseif $item3 == 'calendar'}
+                            <i class="fa fa-calendar fa-fw"></i>
+                            {$res->i18n->itemsCalendar($item2["plural`$smarty.session.lzalanguage`"])}
+                        {elseif $item3 == 'add'}
+                            <i class="fa fa-edit fa-fw"></i>
+                            {$res->i18n->addNewItem($item2["single`$smarty.session.lzalanguage`"])}
+                        {elseif $item3 == 'statistics'}
+                            <i class="fa fa-bar-chart-o fa-fw"></i>
+                            {$res->i18n->showItemStatistics($item2["single`$smarty.session.lzalanguage`"])}
+                        {elseif $item3 == 'tree'}
+                            <i class="fa fa-tree fa-fw"></i>
+                            {$res->i18n->showItemTree($item2["plural`$smarty.session.lzalanguage`"])}
+                        {else}
+                            <i class="fa fa-gear fa-fw"></i>
+                            {name_format(ucwords($item3))}
+                        {/if}
+                    </a>
+                {/if}
+            </li>
+        {/foreach}
+    </ul>
+{/if}

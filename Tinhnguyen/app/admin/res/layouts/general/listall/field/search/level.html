@@ -1,0 +1,9 @@
+{assign var=options value=$res->encryptor->jsonDecode($field['display'], true)}
+<select id="search-{$field['field']}" multiple="multiple"
+        class="form-control column-search select2-multiple">
+    {foreach $options as $option => $level}
+        <option value="{$level}">
+            {$res->i18n->get($option)}
+        </option>
+    {/foreach}
+</select>

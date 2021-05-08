@@ -1,0 +1,85 @@
+<form method="post" id="form-add-bar" show="loading">
+    <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+    <div class="modal fade" id="add-bar-modal" role="dialog"
+         aria-labelledby="AddBarModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="AddBarModalLabel">
+                        {$res->i18n->addStatistic}
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="padding: 20px 20px 20px 20px">
+                        <div class="form-group input-group">
+                            <span class="input-group-addon">
+                                {$res->i18n->name}
+                            </span>
+                            <input type="text" class="form-control"
+                                   id="add-bar-name" name="add_name" />
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon">
+                                {$res->i18n->field}
+                            </span>
+                            <select class="form-control" id="add-bar-field" name="add_field">
+                                {foreach $fields as $field}
+                                    {if in_array($field['type'], ['has', 'have', 'belong', 'enum'])}
+                                        <option value="{$field['id']}">
+                                            {$field["single`$smarty.session.lzalanguage`"]}
+                                        </option>
+                                    {elseif in_array($field['type'], ['weakbelong'])}
+                                        {assign var=fieldParts value=explode(':', $field['field'])}
+                                        <option value="{$field['id']}">
+                                            {$fieldParts[0]}
+                                        </option>
+                                    {/if}
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon">
+                                {$res->i18n->type}
+                            </span>
+                            <select class="form-control" id="add-bar-type" name="add_type">
+                                <option value="Horizontal Bar Chart">
+                                    {$res->i18n->chartBarHorizontal}
+                                </option>
+                                <option value="Vertical Bar Chart">
+                                    {$res->i18n->chartBarVertical}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon">
+                                {$res->i18n->width}
+                            </span>
+                            <select class="form-control" id="add-bar-width" name="add_width">
+                                <option value="6">
+                                    {$res->i18n->sizeSmall}
+                                </option>
+                                <option value="12">
+                                    {$res->i18n->sizeLarge}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group input-group">
+                            <span class="input-group-addon">
+                                {$res->i18n->order}
+                            </span>
+                            <input type="text" class="form-control" value="1"
+                                   id="add-bar-order" name="add_order" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="action" value="AddBarChart"
+                            class="btn btn-success">
+                        {$res->i18n->add}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

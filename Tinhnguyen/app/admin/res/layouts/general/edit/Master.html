@@ -1,0 +1,27 @@
+{extends file="public/Master.html"}
+{block name=body}
+    {if !$prohibit}
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    {$res->i18n->editItem($table["single`$smarty.session.lzalanguage`"])}
+                </h1>
+            </div>
+        </div>
+        <div class="row form">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-{$table['icon']}"></i>
+                        {$itemLabel}
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            {$editForm}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
+{/block}

@@ -1,0 +1,10 @@
+$(document).ready(function()
+{
+    $('#lza-form').submit(function()
+    {
+        $(document).ready(function()
+        {
+            $("#loading-modal").modal("show");
+        });
+    });
+});

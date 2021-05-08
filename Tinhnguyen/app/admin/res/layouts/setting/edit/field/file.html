@@ -1,0 +1,18 @@
+<span><b>{$label}</b></span>
+<input type="checkbox" class="hide" id="updates-{$id}" value="{$id}" />
+<div class="form-group input-group">
+    <span class="input-group-addon">
+        <input id="enable-{$id}" type="checkbox"
+               onclick="javascript:toggle('{$id}-button');" />
+    </span>
+    <input disabled="disabled" type="text"
+           style="height: 100%" class="{$class}"
+           id="{$id}" name="{$name}"
+           value="{$value}" placeholder="{$placeholder}" />
+    <span class="input-group-addon">
+        <button disabled="disabled" id="{$id}-button"
+                type="button" style="border: none">
+            <i class="fa fa-folder-open" ></i>
+        </button>
+    </span>
+</div>

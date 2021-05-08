@@ -1,0 +1,42 @@
+<div class="col-lg-12">
+    <div class="pull-right">
+        <button title="{$res->i18n->add}"
+                aria-expanded="true" type="button"
+                style="padding: 5px 15px 5px 15px;"
+                class="btn btn-default btn-sm list-button dropdown-toggle group-buttons"
+                data-toggle="dropdown">
+            <i class="fa fa-plus"></i>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right" role="menu">
+            <li>
+                <a data-toggle="modal" data-target="#add-pie-modal">
+                    <i class="fa fa-pie-chart"></i>
+                    {$res->i18n->chartPie}
+                </a>
+            </li>
+            <li>
+                <a data-toggle="modal" data-target="#add-line-modal">
+                    <i class="fa fa-line-chart"></i>
+                    {$res->i18n->chartLine}
+                </a>
+            </li>
+            <li>
+                <a data-toggle="modal" data-target="#add-area-modal">
+                    <i class="fa fa-area-chart"></i>
+                    {$res->i18n->chartArea}
+                </a>
+            </li>
+            <li>
+                <a data-toggle="modal" data-target="#add-bar-modal">
+                    <i class="fa fa-bar-chart"></i>
+                    {$res->i18n->chartBar}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{include file="general/statistics/AddPieChart.html"}
+{include file="general/statistics/AddBarChart.html"}
+{include file="general/statistics/AddLineChart.html"}
+{include file="general/statistics/AddAreaChart.html"}

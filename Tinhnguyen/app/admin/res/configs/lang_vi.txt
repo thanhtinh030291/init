@@ -1,0 +1,6 @@
+all_items=Tất Cả Các Mục
+new_items=Mục Mới
+updated_items=Mục Cập Nhật
+deleted_items=Mục Đã Xóa
+add_user_email_subject=Thông tin đăng nhập trên %s cho %s (%s)
+add_user_email_message=Kính chào %s,<br /><br />Một người dùng mới tại %s đã được khởi tạo cho bạn với những thông tin dưới đây:<br/><br/>Tên Đăng Nhập: <strong>%s</strong><br />Thư Điện Tử: <strong>%s</strong><br />Mật Khẩu: <strong>%s</strong><br /><br />Cám ơn,<br />%s

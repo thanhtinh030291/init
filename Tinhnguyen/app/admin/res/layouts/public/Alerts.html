@@ -1,0 +1,48 @@
+{if strlen($successAlert) + strlen($infoAlert) + strlen($warningAlert) + strlen($errorAlert) > 0}
+    <div class="col-lg-12">
+        {if strlen($successAlert) > 0}
+            <div class="alert alert-success alert-dismissable"
+                 style="margin-top: 30px">
+                <button type="button" class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    &times;
+                </button>
+                {$successAlert}.
+            </div>
+        {/if}
+        {if strlen($infoAlert) > 0}
+            <div class="alert alert-info alert-dismissable"
+                 style="margin-top: 30px">
+                <button type="button" class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    &times;
+                </button>
+                {$infoAlert}.
+            </div>
+        {/if}
+        {if strlen($warningAlert) > 0}
+            <div class="alert alert-warning alert-dismissable"
+                 style="margin-top: 30px">
+                <button type="button" class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    &times;
+                </button>
+                {$warningAlert}.
+            </div>
+        {/if}
+        {if strlen($errorAlert) > 0}
+            <div class="alert alert-danger alert-dismissable"
+                 style="margin-top: 30px">
+                <button type="button" class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    &times;
+                </button>
+                {$errorAlert}
+            </div>
+        {/if}
+    </div>
+{/if}

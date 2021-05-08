@@ -1,0 +1,19 @@
+<div class="col-lg-6">
+    <span id="title-{$id}" title="{$note}"
+          data-original-title="{$note}"
+          data-toggle="tooltip"
+          data-placement="top">
+        <b>{$label}</b>
+    </span>
+    <div class="form-group input-group">
+        <input readonly="readonly" type="text"
+               style="height: 100%" class="{$class}"
+               id="{$id}" name="{$name}"
+               placeholder="{$placeholder}" value="{$value}" />
+        <span class="input-group-addon">
+            <button id="{$id}-button" type="button" style="border: none">
+                <i class="fa fa-folder-open" ></i>
+            </button>
+        </span>
+    </div>
+</div>

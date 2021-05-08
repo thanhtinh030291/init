@@ -1,0 +1,17 @@
+<div class="col-lg-12">
+    <span id="title-{$id}" title="{$note}"
+          data-original-title="{$note}"
+          data-toggle="tooltip"
+          data-placement="top">
+        <b>{$label}</b>
+    </span>
+    <div class="form-group input-group">
+        <select disabled="disabled" multiple="multiple"
+                class="{$class}" id="version-{$revision}-{$id}">
+            {$options}
+        </select>
+        <span class="input-group-addon">
+            <i class="fa fa-list" ></i>
+        </span>
+    </div>
+</div>

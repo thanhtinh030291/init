@@ -1,0 +1,38 @@
+{foreach $menu as $item1}
+    <li>
+        <a href="#">
+            <i class="fa fa-{if isset($item1['icon']) && strlen($item1['icon']) > 0}{$item1['icon']}{else}table{/if} fa-fw"></i>
+            <span class="masked">
+                {$item1["plural`$smarty.session.lzalanguage`"]}
+                <span class="fa arrow"></span>
+            </span>
+        </a>
+        {include file="public/sidebar/menu/Level1.html"}
+    </li>
+{/foreach}
+<div class="modal fade" id="loading-modal">
+    <div id="loading">
+        <i class="fa fa-spinner fa-spin"></i>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function()
+{
+    $("#menu-toggle").click(function(e)
+    {
+        $.post(
+            "{$regionPath}?{$smarty.session.token_name}_token={$smarty.session.token_value}&action=ToggleMenu",
+            function(data)
+            {
+                e.preventDefault();
+                $("#menu-toggle-icon").toggleClass("fa-chevron-left");
+                $("#menu-toggle-icon").toggleClass("fa-chevron-right");
+                $("#wrapper").toggleClass("toggled");
+                $('#wrapper.toggled').find("#sidebar-wrapper")
+                                     .find(".collapse")
+                                     .collapse('hide');
+            }
+        );
+    });
+});
+</script>

@@ -1,0 +1,25 @@
+{if is_array($item2)}
+    <a href="{$regionPath}/{chain_case($item1['id'])}/{$item2['uri']}">
+        <i class="fa fa-gear fa-fw"></i>
+        {$item2['text']}
+    </a>
+{else}
+    <a href="{$regionPath}/{chain_case($item1['id'])}/{$item2}">
+        {if $item2 == 'list'}
+            <i class="fa fa-list fa-fw"></i>
+            {$res->i18n->listAllItems($item1["plural`$smarty.session.lzalanguage`"])}
+        {elseif $item2 == 'calendar'}
+            <i class="fa fa-calendar fa-fw"></i>
+            {$res->i18n->itemsCalendar($item1["plural`$smarty.session.lzalanguage`"])}
+        {elseif $item2 == 'add'}
+            <i class="fa fa-plus fa-fw"></i>
+            {$res->i18n->addNewItem($item1["single`$smarty.session.lzalanguage`"])}
+        {elseif $item2 == 'statistics'}
+            <i class="fa fa-bar-chart-o fa-fw"></i>
+            {$res->i18n->showItem_statistics($item1["single`$smarty.session.lzalanguage`"])}
+        {else}
+            <i class="fa fa-gear fa-fw"></i>
+            {name_format(ucwords($item2))}
+        {/if}
+    </a>
+{/if}

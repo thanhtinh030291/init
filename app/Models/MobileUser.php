@@ -24,10 +24,8 @@ class MobileUser extends Authenticatable
      */
 
     public $table = 'mobile_user';
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
-
+    protected $guarded = ['id'];
+    public $timestamps = false;
     /**
      * The attributes that should be hidden for arrays.
      *

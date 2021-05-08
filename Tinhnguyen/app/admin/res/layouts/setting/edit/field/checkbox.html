@@ -1,0 +1,12 @@
+<span><b>{$label}</b></span>
+<input type="checkbox" class="hide" id="updates-{$id}" value="{$id}" />
+<div class="form-group input-group">
+    <span class="input-group-addon">
+        <input id="enable-{$id}" type="checkbox" onclick="javascript:toggleCheckbox('{$id}');" />
+    </span>
+    <label>
+        <input disabled="disabled" type="checkbox" bootstrap="bootstrap"
+               id="{$id}" {if $value == 1}checked="checked"{/if} name="{$name}" />
+        {ucwords(str_replace('_', ' ', $id))}
+    </label>
+</div>

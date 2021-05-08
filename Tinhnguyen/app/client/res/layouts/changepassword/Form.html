@@ -1,0 +1,32 @@
+<div id="gain_content" style="display: inline;" class="gain-container login">
+    <form id="lza-form" class="form-signin" method="post" show="loading">
+        <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+        <div class="login-header">
+            <a><img src="{CLIENT_RES_PATH}images/logo.png"></a>
+        </div>
+        <div class="alert alert-warning" role="alert">{$res->i18n->changePassword}</div>
+
+        <label for="inputOldPass" class="sr-only">{$res->i18n->oldPassword}</label>
+        <input type="password" rel="inputOldPass"
+               name="inputOldPass" id="inputOldPass"
+               class="form-control required"
+               placeholder="{$res->i18n->oldPassword}"
+               required="" autofocus="" value="">
+
+        <label for="inputNewPass" class="sr-only">{$res->i18n->newPassword}</label>
+        <input type="password" name="inputNewPass" id="inputNewPass"
+               style="width: px;" class="form-control required"
+               placeholder="{$res->i18n->newPassword}" required="" value="">
+
+        <label for="inputConfirm" class="sr-only">{$res->i18n->confirmPassword}</label>
+        <input type="password" name="inputConfirm" id="inputConfirm"
+               style="width: px;" class="form-control required"
+               placeholder="{$res->i18n->confirmPassword}" required="" value="">
+
+        <button class="btn btn-lg btn-warning btn-block"
+                type="submit" name="action" value="update">
+            {$res->i18n->update}
+        </button>
+    </form>
+    <script type="text/javascript" sec="{WEBSITE_ROOT}resources/scripts/form_validate.js"></script>
+</div>

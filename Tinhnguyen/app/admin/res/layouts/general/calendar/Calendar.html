@@ -1,0 +1,91 @@
+<style type="text/css">
+.custom-date-style {
+    background-color: red !important;
+}
+.input{
+
+}
+.input-wide{
+    width: 500px;
+}
+.no-display{
+    display: none;
+}
+</style>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {$table["plural`$smarty.session.lzalanguage`"]}
+                <div class="pull-right">
+                    <div class="btn-group">
+                        {if (!isset($options->add) || $options->add) && ($permission & ADD_LEVEL) === ADD_LEVEL}
+                            <button type="button"
+                                    title="{$res->i18n->addNewItem(
+                                                $table["single`$smarty.session.lzalanguage`"]
+                                            )}"
+                                    class="btn btn-default btn-sm list-button group-buttons"
+                                    onClick="window.open('{$regionPath}/{$res->env->module}/add');">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        {/if}
+                        <button title="{$res->i18n->advanced}"
+                                aria-expanded="true"
+                                type="button" style="padding: 5px 15px 5px 15px;"
+                                class="btn btn-default btn-sm list-button dropdown-toggle group-buttons" data-toggle="dropdown">
+                            <i class="fa fa-navicon"></i> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu">
+                            {if (!isset($options->add) || $options->add) && ($permission & ADD_LEVEL) === ADD_LEVEL}
+                                <li>
+                                    <a data-toggle="modal" data-target="#import-modal">
+                                        <i class="fa fa-download"></i>
+                                        {$res->i18n->import($table["plural`$smarty.session.lzalanguage`"])}
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                            {/if}
+                            <li>
+                                <a data-toggle="modal" data-target="#export-all-modal">
+                                    <i class="fa fa-upload"></i>
+                                    {$res->i18n->exportAll($table["plural`$smarty.session.lzalanguage`"])}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="calendar" class="col-centered"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function()
+{
+    $('#calendar').fullCalendar(
+    {
+        header:
+        {
+            left: 'prevYear,prev,today,next,nextYear',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay,listWeek'
+        },
+        defaultDate: '{date('Y-m-d')}',
+        editable: false,
+        eventLimit: true,
+        selectable: true,
+        selectHelper: true,
+        eventRender: function(event, element)
+        {
+            element.bind('dblclick', function()
+            {
+                window.location.href = '{str_replace('calendar', 'show/', WEBSITE_URL)}'
+                                     + event.itemid;
+            });
+        },
+        events: '{WEBSITE_URL}?{$smarty.session.token_name}_token={$smarty.session.token_value}&action=GetItems'
+    });
+});
+</script>

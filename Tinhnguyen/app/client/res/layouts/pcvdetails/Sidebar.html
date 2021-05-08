@@ -1,0 +1,14 @@
+<div id="policy_search_listing" class="col-xs-12 col-sm-3 hidden-print">
+    <div id="pol_item" class="pol_item"
+         item_key="pd{$member['mbr_no']}"
+         ptype="pl" mbr_no="{$member['mbr_no']}"
+         alias="{$member['mbr_no']}">
+        <span class="hname">{$member['mbr_last_name']} {$member['mbr_first_name']}</span>
+        <span class="sub">{$smarty.session.search.memb_ref_no}</span>
+        <span class="sub">{#dob#}: {$member['dob']}</span>
+    </div>
+    <div class="pol_item">
+        {html_entity_decode($res->setting->{"exclusion`$smarty.session.lzalanguage`"})}
+    </div>
+</div>
+<script type="text/javascript" src="{WEBSITE_ROOT}resources/scripts/policy_load.js"></script>

@@ -1,0 +1,97 @@
+# Ignore Indexing and Allow Symbolic Links
+Options +FollowSymlinks -Indexes
+IndexIgnore *
+
+# Turn off Server Signature
+ServerSignature Off
+
+# DoS Protection
+SetEnvIf Range (,.*?){5,} bad-range=1
+RequestHeader unset Range env=bad-range
+
+# Secure Sessions and Cookies
+#php_value session.cookie_httponly 1
+#php_value session.cookie_secure 1
+
+# Prevent iFrame, XSS, Sniffing
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set X-Content-Security-Policy "allow 'self';"
+Header always set X-Content-Type-Options "nosniff"
+
+# Activate HTTP Strict Transport Security
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+
+# Disable CORS
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Credentials "true"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "X-Requested-With, Content-Type, Accept, Origin, Authorization, Session-ID, Language, TimezoneOffset, LocaleLang"
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Fallback non-existing scripts
+DirectoryIndex /index.php
+FallbackResource /index.php
+
+# Disable Trace/Track requests
+RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)
+RewriteRule .* - [F]
+
+# Cover Front-End Resources
+RewriteRule ^resources/(.*)$ /root/app/client/res/$1 [NC]
+RewriteRule ^admin-res/(.*)$ /root/app/admin/res/$1 [NC]
+RewriteRule ^libraries/(.*)$ /root/lib/other/$1 [NC]
+RewriteRule ^vendors/(.*)$ /root/lib/vendor/$1 [NC]
+
+# Allow any files or directories that exist to be displayed directly
+RewriteCond %{REQUEST_URI} ^.+$
+RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g|png|bmp|js|css|swf|php|ico|txt|pdf|xml)$ [OR]
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d [OR]
+RewriteCond %{REQUEST_FILENAME} -l
+RewriteRule ^ - [QSA,L]
+
+# PHP Basic Authentication
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+
+# PHP-CGI Vulnerability
+RewriteCond %{QUERY_STRING} ^(%2d|\-)[^=]+$ [NC]
+RewriteRule (.*) - [F,L]
+
+# File Injection Protection
+RewriteCond %{REQUEST_METHOD} GET
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http%3A%2F%2F [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC]
+RewriteRule .* - [F]
+
+# Prevent harmful scripts to be run
+RewriteCond %{QUERY_STRING} base64_encode[^(]*\([^)]*\) [OR]
+RewriteCond %{QUERY_STRING} (<|%3C)([^s]*s)+cript.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteRule .* - [F]
+
+# Prevent Blank User-Agent and Referer
+RewriteCond %{HTTP_REFERER} ^$ [NC]
+RewriteCond %{HTTP_USER_AGENT} ^$ [NC]
+RewriteRule ^(.*)\.(ico|gif|jpe?g|png|bmp|swf)$ - [F,L]
+
+# Block Evil Robots, Site Rippers
+RewriteBase /
+RewriteCond %{HTTP_USER_AGENT} ^atraxbot [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^Azureus [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^geohasher [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^PycURL [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^Python-urllib [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^research-scan-bot [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^Sosospider [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^Wget [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^xenu [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^.*casper [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^.*goblox [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} ^.*sun4u [NC]
+RewriteRule ^(.*)$ - [F]

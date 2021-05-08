@@ -1,0 +1,10 @@
+[05-May-2021 20:44:47 Asia/Ho_Chi_Minh] [FATAL]: oci_parse(): ORA-03114: not connected to ORACLE
+
+#0 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\app\task\src\ImportDataTask.class.php(196): PDOOCI\PDO->query(' SELECT\n    'pc...')<br />
+#1 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\app\task\src\ImportDataTask.class.php(134): Lza\App\Task\ImportDataTask->getDataFromHbs(Object(PDOOCI\PDO), ' SELECT\n    'pc...', true)<br />
+#2 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\app\task\src\ImportDataTask.class.php(111): Lza\App\Task\ImportDataTask->getData(Object(PDOOCI\PDO), Object(Lza\Config\Models\BaseModel), ' SELECT\n    'pc...', 'cl_no', true)<br />
+#3 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\config\Cron.class.php(94): Lza\App\Task\ImportDataTask->execute(true)<br />
+#4 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\core\Core.class.php(110): Lza\Config\Cron->launch('Client')<br />
+#5 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\core\Core.class.php(62): Lza\LazyAdmin\Core->__construct()<br />
+#6 D:\xampp\htdocs\pacific_project\Mobile_Backend\branches\Tinhnguyen\config\public\cron.php(8): Lza\LazyAdmin\Core::main()<br />
+#7 {main}

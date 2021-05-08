@@ -1,0 +1,1 @@
+select sum_insured from mr_member_plan mepl where mepl.mepl_oid = ?

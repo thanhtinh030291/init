@@ -1,0 +1,64 @@
+.list-button
+{
+    float: right;
+    margin-top: -5px;
+    margin-right: 5px;
+    padding: 5px 20px 5px 20px !important;
+}
+.column-search
+{
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.select2-container--bootstrap
+{
+    width: 100% !important;
+}
+span.select2-selection--multiple
+{
+    width: 100% !important;
+    font-family: 'FontAwesome';
+    overflow-y: auto;
+}
+.select2-selection.select2-selection--multiple.form-control
+{
+    height: 100% !important;
+}
+.select2-results
+{
+    font-family: 'FontAwesome';
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice
+{
+    margin-top: 0px !important;
+    margin-bottom: 2px !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendere
+{
+    margin-bottom: -9px !important;
+    font-size: 12px !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-search--inline .select2-search__field
+{
+    margin-top: -5px !important;
+}
+.query-builder .rules-group-container
+{
+    background-color: transparent !important;
+    border: 1px solid #AAA !important;
+}
+
+table thead, table tfoot
+{
+    text-align: center;
+}
+
+table tbody
+{
+    text-align: left;
+}
+
+.dataTables_filter input
+{
+    height: 34px;
+}

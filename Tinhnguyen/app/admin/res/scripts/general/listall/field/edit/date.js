@@ -1,0 +1,1 @@
+$("#{$id}").datetimepicker({ value: '{$value}', format: '{$format}', timepicker: false });

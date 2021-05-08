@@ -1,0 +1,26 @@
+<div id="gain_content" style="display: inline;" class="gain-container login">
+    <form id="lza-form" class="form-signin" method="post">
+        <input type="hidden" name="{$tokenName}_token" value="{$tokenValue}" />
+        <div class="login-header">
+            <a><img src="{CLIENT_RES_PATH}images/logo.png"></a>
+        </div>
+        <div class="alert alert-success" role="alert">
+            Plese specify your new password and confirm again
+        </div>
+        <label for="inputPassword" class="sr-only">New Password</label>
+        <input type="password" name="inputPassword" id="inputPassword"
+               style="width: px;" class="form-control"
+               placeholder="New Password" required="" value="">
+        <label for="inputConfirm" class="sr-only">
+            Confirm Password
+        </label>
+        <input type="password" name="inputConfirm" id="inputConfirm"
+               style="width: px;" class="form-control"
+               placeholder="Confirm Password" required="" value="">
+        <button class="btn btn-lg btn-success btn-block"
+                type="submit" name="action" value="ResetPassword">
+            Reset Password
+        </button>
+    </form>
+    <script type="text/javascript" src="{WEBSITE_ROOT}resources/scripts/form_validate.js"></script>
+</div>

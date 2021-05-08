@@ -1,0 +1,1 @@
+CKEDITOR.replace('version-{$revision}-{$id}');

@@ -9,6 +9,7 @@ use App\Models\PlanHbsConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
+use App\Models\MobileUser;
 use DB;
 
 
@@ -78,5 +79,13 @@ class SettingController extends Controller
         $request->session()->flash('status', "setting update success"); 
         return redirect('/admin/setting');
     }
+    
+    public function updatePass(Request $request){
+        $MobileUser = MobileUser::all();
+        foreach ($MobileUser as $key => $value) {
+            
+        }
+    }
+
     
 }

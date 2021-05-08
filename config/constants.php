@@ -16,5 +16,12 @@ return[
         30 => 30,
         40 => 40,
         50 => 50,
-    ]
+    ],
+    'company' => [
+        'pcv' => 'PCV',
+        'bsh' => 'BSH',
+        'fubon' => 'Fubon',
+        'cathay' => 'Cathay',
+    ],
+    'min_age_use_app' => 16,
 ];
