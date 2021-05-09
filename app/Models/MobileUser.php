@@ -35,6 +35,11 @@ class MobileUser extends Authenticatable
         'password'
     ];
 
+    public function validateForPassportPasswordGrant($password)
+    {
+
+        return true;
+    }
     /**
      * The attributes that should be cast to native types.
      *

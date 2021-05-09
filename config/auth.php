@@ -70,10 +70,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'mobile_user' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\MobileUser::class,
+        ],
     ],
 
     /*

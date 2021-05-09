@@ -34,6 +34,23 @@ function saveImage($file ,$path, $thumbnail=null){
     return $file_name;
 }
 
+function saveImageBase64 ($base64 , $path , $oldFile = null){
+    if($oldFile){
+        Storage::delete($path.$oldFile);
+    }
+    if (!File::exists(storage_path("app".$path)))
+    {
+        File::makeDirectory(storage_path("app".$path), 0777, true, true);
+    }
+    $handle=fopen("php://temp", "rw");
+    fwrite($handle, base64_decode($base64));
+    fseek($handle, 0);
+    $extension = explode('/', mime_content_type($handle))[1];
+    $fileName = time() . '.' . $extension;
+    Storage::put($path.$fileName, base64_decode($base64));
+    return $fileName;
+}
+
 function saveFile($file ,$path ,$oldFile = null)
 {
     if($oldFile){
@@ -479,5 +496,48 @@ function hashpass($data, $recursive = 2)
     $data = hash_hmac('SHA256', $data, $KEY);
     $data = hash_hmac('SHA256', $data, $KEY);
     return  $data ;
+}
+
+function vn_to_str ($str){
+
+    $unicode = array(
+    
+    'a'=>'á|à|ả|ã|ạ|ă|ắ|ặ|ằ|ẳ|ẵ|â|ấ|ầ|ẩ|ẫ|ậ',
+    
+    'd'=>'đ',
+    
+    'e'=>'é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ',
+    
+    'i'=>'í|ì|ỉ|ĩ|ị',
+    
+    'o'=>'ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ',
+    
+    'u'=>'ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự',
+    
+    'y'=>'ý|ỳ|ỷ|ỹ|ỵ',
+    
+    'A'=>'Á|À|Ả|Ã|Ạ|Ă|Ắ|Ặ|Ằ|Ẳ|Ẵ|Â|Ấ|Ầ|Ẩ|Ẫ|Ậ',
+    
+    'D'=>'Đ',
+    
+    'E'=>'É|È|Ẻ|Ẽ|Ẹ|Ê|Ế|Ề|Ể|Ễ|Ệ',
+    
+    'I'=>'Í|Ì|Ỉ|Ĩ|Ị',
+    
+    'O'=>'Ó|Ò|Ỏ|Õ|Ọ|Ô|Ố|Ồ|Ổ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ở|Ỡ|Ợ',
+    
+    'U'=>'Ú|Ù|Ủ|Ũ|Ụ|Ư|Ứ|Ừ|Ử|Ữ|Ự',
+    
+    'Y'=>'Ý|Ỳ|Ỷ|Ỹ|Ỵ',
+    
+    );
+    
+    foreach($unicode as $nonUnicode=>$uni){
+    
+    $str = preg_replace("/($uni)/i", $nonUnicode, $str);
+    
+    }
+    return $str;
+    
 }
 

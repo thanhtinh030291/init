@@ -15,17 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('login', 'App\Http\Controllers\Api\MemberController@login');
 Route::post('register', 'App\Http\Controllers\Api\MemberController@register');
-Route::post('signup', 'AuthController@signup');
-Route::group([
-    'prefix' => 'auth'
-], function () {
-    Route::post('login', 'AuthController@login');
-    Route::post('signup', 'AuthController@signup');
-   
-    Route::group([
-      'middleware' => 'auth:api'
-    ], function() {
-        Route::delete('logout', 'AuthController@logout');
-        Route::get('me', 'AuthController@user');
-    });
+Route::post('ekyc', 'App\Http\Controllers\Api\MemberController@ekyc');
+//Route::post('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
+Route::group(['middleware' => 'auth:api'], function() {
+    Route::post('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
+        
 });
