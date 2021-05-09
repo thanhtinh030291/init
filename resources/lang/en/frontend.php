@@ -81,7 +81,7 @@ return [
     'copay'=>'Co-Payment',
     'create_mobile_user_message'=>'Dear %s,<br/><br/>We ve created account for you at %s.<br /><br />Your Username is <b style="color: red">%s</b><br />Your Password is <b style="color: red">%s</b><br /><br />Thank you.',
     'create_mobile_user_subject'=>'Mobile Claim User Created at %s',
-    'create_reset_password_request_message'=>'Dear %s,<br/><br/>A Reset Password Request has been created at %s.<br /><br />Your Member No is <b style="color: red">%s</b><br />New password is <b style="color: red">%s</b><br />If you didnt make this request, please ignore this email.<br /><br />Thank you.',
+    'create_reset_password_request_message'=>'Dear %s,<br/><br/>A Reset Password Request has been created at %s.<br /><br />Your Email is <b style="color: red">%s</b><br />New password is <b style="color: red">%s</b><br />If you didnt make this request, please ignore this email.<br /><br />Thank you.',
     'create_reset_password_request_subject'=>'Reset Password Request Created at %s',
     'created_at'=>'Created At',
     'day_dis_yr'=>'Day Per Disability per Year',

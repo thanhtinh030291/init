@@ -46,7 +46,8 @@ function saveImageBase64 ($base64 , $path , $oldFile = null){
     fwrite($handle, base64_decode($base64));
     fseek($handle, 0);
     $extension = explode('/', mime_content_type($handle))[1];
-    $fileName = time() . '.' . $extension;
+    $str = Str::random(10);
+    $fileName = time() . $str . '.' . $extension;
     Storage::put($path.$fileName, base64_decode($base64));
     return $fileName;
 }

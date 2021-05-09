@@ -267,14 +267,48 @@ class MemberController extends BaseController
     }
 
     /**
+     * forget-password
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function forget_password(Request $request){
+        //valid parameter 
+        $validator = Validator::make($request->all(), [
+            'email' => 'email|required'
+        ]);
+        
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 201 );       
+        }
+
+        $user = MobileUser::where('email', $request->email)->first();
+        if($user == null){
+            return $this->sendError(__('frontend.account_not_exist'), 2);
+        }
+        try {
+            DB::beginTransaction();
+            $password = Str::random(8);
+            $user->password = hashpass($password);
+            $user->save;
+            $data['contents'] = sprintf(__('frontend.create_reset_password_request_message'),$user->fullname,config('app.name'),$request->email, $password);
+            sendEmail($user, $data,'templateEmail.noTeamplate', __('frontend.create_reset_password_request_subject'));
+            DB::commit();
+            return $this->sendResponse( true, __('frontend.reset_created') , 0);
+        } catch (Exception $e) {
+            Log::error(generateLogMsg($e));
+            DB::rollback();
+            return $this->sendError(__('frontend.internal_server_error'), 500 );
+        }
+    }
+
+    /**
      * photo api
      *
      * @return \Illuminate\Http\Response
      */
     public function photo(Request $request,$mbr_no)
     {
-        //$photo['contents']
-        //valid parameter 
+        //dd($request);
         $validator = Validator::make($request->all(), [
             'photo.contents' => 'required|base64',
         ]);
@@ -282,7 +316,19 @@ class MemberController extends BaseController
         if($validator->fails()){
             return $this->sendError(__('frontend.invalid_photo') , 201 );       
         }
-        dd(1);
-        $file_name = saveImageBase64 ($request->photo['contents'] , $path );
+        $user = Auth::user();
+        $path = config('constants.photoUpload');
+        try {
+            DB::beginTransaction();
+            $file_name = saveImageBase64 ($request->photo['contents'] , $path , $user->photo);
+            $user->photo = $file_name;
+            $user->save();
+            DB::commit();
+            return $this->sendResponse( true, __('frontend.photo_updated') , 0);
+        } catch (Exception $e) {
+            Log::error(generateLogMsg($e));
+            DB::rollback();
+            return $this->sendError(__('frontend.internal_server_error'), 500 );
+        }
     }
 }

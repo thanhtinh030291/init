@@ -81,7 +81,7 @@ return [
     'copay'=>'Đồng Chi Trả',
     'create_mobile_user_message'=>'Kính chào %s,<br/><br/>Chúng tôi đã tạo tài khoản cho bạn tại %s.<br /><br />Tên đăng nhập của bạn là <b style="color: red">%s</b><br />Mật khẩu của bạn là <b style="color: red">%s</b><br /><br />Cám ơn.',
     'create_mobile_user_subject'=>'Tài khoản đã được khởi tạo tại %s',
-    'create_reset_password_request_message'=>'Kính chào %s,<br/><br/>Một yêu cầu đặt lại mật khẩu đã được khởi tạo tại %s.<br /><br />Mã thành viên của bạn là <b style="color: red">%s</b><br />Mật khẩu mới của bạn là <b style="color: red">%s</b><br />Nếu bạn không thực hiện yêu cầu này, thì phiền bạn bỏ qua thử điện tử này.<br /><br />Cám ơn.',
+    'create_reset_password_request_message'=>'Kính chào %s,<br/><br/>Một yêu cầu đặt lại mật khẩu đã được khởi tạo tại %s.<br /><br />Email của bạn là <b style="color: red">%s</b><br />Mật khẩu mới của bạn là <b style="color: red">%s</b><br />Nếu bạn không thực hiện yêu cầu này, thì phiền bạn bỏ qua thử điện tử này.<br /><br />Cám ơn.',
     'create_reset_password_request_subject'=>'Yêu cầu đặt lại mật khẩu tại %s',
     'created_at'=>'Thời điểm tạo',
     'day_dis_yr'=>'Số Ngày trên một Khuyết Tật mỗi Năm',

@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', 'App\Http\Controllers\Api\MemberController@login');
 Route::post('register', 'App\Http\Controllers\Api\MemberController@register');
 Route::post('ekyc', 'App\Http\Controllers\Api\MemberController@ekyc');
-//Route::post('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
+Route::post('forget-password', 'App\Http\Controllers\Api\MemberController@forget_password');
+
 Route::group(['middleware' => 'auth:api'], function() {
-    Route::post('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
+    Route::patch('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
         
 });
