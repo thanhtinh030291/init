@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use App\Helps\PcvInsuredCardBuilder;
 
 class MemberController extends BaseController
 {
@@ -291,7 +292,7 @@ class MemberController extends BaseController
             $user->password = hashpass($password);
             $user->save;
             $data['contents'] = sprintf(__('frontend.create_reset_password_request_message'),$user->fullname,config('app.name'),$request->email, $password);
-            sendEmail($user, $data,'templateEmail.noTeamplate', __('frontend.create_reset_password_request_subject'));
+            sendEmail($user, $data,'templateEmail.noTeamplate', sprintf(__('frontend.create_reset_password_request_subject'), config('app.name')));
             DB::commit();
             return $this->sendResponse( true, __('frontend.reset_created') , 0);
         } catch (Exception $e) {
@@ -306,7 +307,7 @@ class MemberController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function photo(Request $request,$mbr_no)
+    public function photo(Request $request)
     {
         //dd($request);
         $validator = Validator::make($request->all(), [
@@ -331,4 +332,127 @@ class MemberController extends BaseController
             return $this->sendError(__('frontend.internal_server_error'), 500 );
         }
     }
+
+    /**
+     * info api
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function info(Request $request)
+    {
+        $user = Auth::user();
+        $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->get()->toArray();
+        if(empty($HbsMember)){
+            return $this->sendError(__('frontend.internal_server_error'), 500 );
+        }
+        $pocyYears = [];
+        foreach ($HbsMember as $row) {
+            $item = $row;
+            $key = strtotime($row['memb_eff_date']) + strtotime($row['memb_exp_date']);
+            $pocyYears[$key] = isset($pocyYears[$key]) ? $pocyYears[$key] : $row;
+            $pocyYears[$key]['plans'] = isset($pocyYears[$key]['plans'])? $pocyYears[$key]['plans'] : explode(';;;', $row['plan_desc']);
+            $pocyYears[$key]['events'] = isset($pocyYears[$key]['events']) ? $pocyYears[$key]['events'] : [];
+            $item['memb_rstr'] = trim($item['memb_rstr']);
+            if (!in_array($item['memb_rstr'], $pocyYears[$key]['events']))
+            {
+                $pocyYears[$key]['events'][] = $item['memb_rstr'];
+            }
+            $pocyYears[$key]['events_vi'] = isset($pocyYears[$key]['events_vi']) ? $pocyYears[$key]['events_vi'] : [];
+            $item['memb_rstr_vi'] = trim($row['memb_rstr_vi']);
+            if (!in_array($item['memb_rstr_vi'], $pocyYears[$key]['events_vi']))
+            {
+                $pocyYears[$key]['events_vi'][] = $row['memb_rstr_vi'];
+            }
+            
+        }
+        krsort($pocyYears);
+        $years = [];
+        foreach ($pocyYears as $year => $pocyYear)
+        {
+            if (isset($years['last']))
+            {
+                $years['previous'] = $pocyYear;
+            }
+            else
+            {
+                $years['last'] = $pocyYear;
+            }
+        }
+
+        foreach ($years as $key => &$pocyYear)
+        {
+            $pocyYear['insured_periods'] = explode(', ', $pocyYear['insured_periods']);
+            foreach ($pocyYear['insured_periods'] as $no => $period)
+            {
+                if (strlen($period) == 0)
+                {
+                    unset($pocyYear['insured_periods'][$no]);
+                }
+            }
+            $pocyYear['memb_rstr'] = null;
+            $pocyYear['memb_rstr_vi'] = null;
+
+            $date = new \DateTime('now');
+            if ($pocyYear['payment_mode'] == 'Semi-Annual')
+            {
+                // $member_eff = new \DateTime($pocyYear['memb_eff_date']);
+                $member_eff = new \DateTime($pocyYear['memb_exp_date']);
+                $member_eff->modify('-12 months')->modify('+1 day');
+                $member_eff->modify('+6 months')->modify('-1 day');
+                $pocyYear['payment_exp'] = $member_eff->format('Y-m-d');
+
+                if ($pocyYear['payment_exp'] < $date->format('Y-m-d'))
+                {
+                    if ($pocyYear['policy_status'] == "Second payment Policy & Health Card Released")
+                    {
+                        $pocyYear['policy_status'] = "First payment Policy was expired";
+                        $pocyYear['request_next_payment'] = true;
+                    }
+                    elseif ($pocyYear['policy_status'] == "Approved")
+                    {
+                        $pocyYear['payment_exp'] = $pocyYear["memb_exp_date"];
+                        $pocyYear['request_next_payment'] = false;
+                    }
+                }
+                elseif ($pocyYear['policy_status'] == "Second payment Policy & Health Card Released")
+                {
+                    $pocyYear['policy_status'] == "First payment Policy & Health Card Released"; // 1 month previous before first payment expired
+                }
+            }
+            else
+            {
+                
+                $member_eff = new \DateTime($pocyYear['memb_exp_date']);
+                $member_eff->modify('-12 months')->modify('+1 day'); // pocy_eff_date
+                $member_eff->modify('+12 months')->modify('-1 day');
+                $pocyYear['payment_exp'] = $member_eff->format('Y-m-d');
+                $pocyYear['request_next_payment'] = false;
+            }
+            $exp_date = new \DateTime($pocyYear['payment_exp']);
+            $exp_date->modify('+13 months')->format('Y-m-d');
+            if ($exp_date > $date->format('Y-m-d'))
+            {
+                $pocyYear['can_claim'] = true;
+            }
+            else
+            {
+                $pocyYear['can_claim'] = false;
+            }
+        }
+        return $this->sendResponse( $years, "OK" , 0);
+    }
+    
+     /**
+     * insurance-card api
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function insurance_card(Request $request){
+        $user = Auth::user();
+        $lang = $this->lang;
+        $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->whereNotNull('ben_schedule')->orderBy('memb_eff_date', 'DESC')->first()->toArray();
+        $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
+        return $this->sendResponse( $PcvInsuredCardBuilder->get(), "OK" , 0);
+    }
+    
 }

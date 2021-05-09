@@ -33,15 +33,15 @@ class AddFieldToHbsMemberTable extends Migration
      */
     public function down()
     {
-        Schema::table('hbs_member', function (Blueprint $table) {
-            //
-            $table->dropColumn('plan_id');
-            $table->dropColumn('rev_no');
-        });
-        Schema::table('hbs_member2', function (Blueprint $table) {
-            //
-            $table->dropColumn('plan_id');
-            $table->dropColumn('rev_no');
-        });
+        // Schema::table('hbs_member', function (Blueprint $table) {
+        //     //
+        //     $table->dropColumn('plan_id');
+        //     $table->dropColumn('rev_no');
+        // });
+        // Schema::table('hbs_member2', function (Blueprint $table) {
+        //     //
+        //     $table->dropColumn('plan_id');
+        //     $table->dropColumn('rev_no');
+        // });
     }
 }

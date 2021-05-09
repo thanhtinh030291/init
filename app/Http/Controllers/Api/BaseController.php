@@ -6,12 +6,18 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\App;
 
 
 
 class BaseController extends Controller
 {
+    public $lang = null;
+
+    public function __construct()
+    {
+        $this->lang = App::currentLocale();
+    }
     /**
      * success response method.
      *

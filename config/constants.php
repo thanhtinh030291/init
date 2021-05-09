@@ -2,7 +2,7 @@
 return[
     'appName' => 'Mobile Assistant',
     'appEmail' => env('MAIL_FROM_ADDRESS', 'admin@pacificcross.com.vn'),
-    'appLogo'     => "/images/logo.png",
+    'appLogo'     => "/img/logo.png",
     'srcUpload'   => '/public/upload/',
     'srcStorage'  => '/storage/upload/',
     'photoUpload'   => '/public/photo/',

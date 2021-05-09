@@ -19,6 +19,7 @@ Route::post('ekyc', 'App\Http\Controllers\Api\MemberController@ekyc');
 Route::post('forget-password', 'App\Http\Controllers\Api\MemberController@forget_password');
 
 Route::group(['middleware' => 'auth:api'], function() {
-    Route::patch('photo/{mbr_no}', 'App\Http\Controllers\Api\MemberController@photo');
-        
+    Route::patch('photo', 'App\Http\Controllers\Api\MemberController@photo');
+    Route::get('info', 'App\Http\Controllers\Api\MemberController@info');    
+    Route::get('insurance-card', 'App\Http\Controllers\Api\MemberController@insurance_card');
 });
