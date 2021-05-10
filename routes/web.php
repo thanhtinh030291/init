@@ -21,7 +21,6 @@ use App\Http\Controllers\HbsPlanConfigController;
 */
 
 Route::get('/', function () {
-    //
     return redirect()->route('home');
 });
 Route::group(['prefix' => 'admin'], function () {

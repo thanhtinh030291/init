@@ -14,7 +14,7 @@ class MobileUser extends Authenticatable
     
     use HasFactory;
     use Notifiable;
-    
+    use \App\Http\Traits\UsesUuid;
     use HasApiTokens;
     //use HasApiTokens2;
     /**

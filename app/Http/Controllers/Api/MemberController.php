@@ -92,8 +92,7 @@ class MemberController extends BaseController
      */
     public function ekyc(Request $request)
     {
-        $data['contents'] = "sdsdsds";
-        sendEmail('tinh', $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));dd(1);
+        
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'pocy_no' => 'required',
@@ -184,20 +183,20 @@ class MemberController extends BaseController
             return $this->sendError(__('frontend.id_font_requid') , 201 );
         }
 
-        $is_member = HbsMember::where('pocy_no', $request->pocy_no)
+        $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)
                     ->whereRaw("UPPER(TRIM(CONCAT(`mbr_first_name`,' ', `mbr_mid_name` , ' ',`mbr_last_name`))) = ?", strtoupper(vn_to_str($mbr_name)))
-                    ->where('dob', $dob)->get();
-        if($is_member == null){
+                    ->where('dob', $dob)->first();
+        if($HbsMember == null){
             return $this->sendError(__('frontend.invalid_effect_member'), 99 );
         }
-        $mbr_no = $is_member->mbr_no;
+        $mbr_no = $HbsMember->mbr_no;
         
-        $MobileUser = MobileUser::where('mbr_no', $mbr_no )->orWhere('email', $request->email)->count();
+        $MobileUser = MobileUser::where('mbr_no', $mbr_no )->count();
         if ($MobileUser != 0) {
             return $this->sendError(__('frontend.account_exist'), 101 );
         }
 
-        $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->where('email', $request->email)->first();
+        
         if($HbsMember->age < config('min_age_use_app')){
             return $this->sendError(__('frontend.member_not_exist'), 101 );
         }
