@@ -1,9 +1,0 @@
-{extends file="public/Master.html"}
-{block name=body}
-    {include file="public/Header.html"}
-    {include file="home/Form.html"}
-    {include file="public/Loading.html"}
-    {if strlen($errorAlert) > 0}
-        {include file="public/Error.html"}
-    {/if}
-{/block}

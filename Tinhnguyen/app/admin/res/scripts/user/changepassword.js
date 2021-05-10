@@ -1,1 +1,0 @@
-$('#lza-form').validate();

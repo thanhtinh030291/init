@@ -1,6 +1,0 @@
-all_items=All Items
-new_items=New Items
-updated_items=Updated Items
-deleted_items=Deleted Items
-add_user_email_subject=New Account on %s for %s (%s)
-add_user_email_message=Dear %s,<br /><br />A new account on %s has been created for you with below information:<br/><br/>Username: <strong>%s</strong><br />Email: <strong>%s</strong><br />Password: <strong>%s</strong><br /><br />Thank you,<br />%s

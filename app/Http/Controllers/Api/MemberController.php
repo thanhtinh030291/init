@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use App\Helps\PcvInsuredCardBuilder;
+use App\Helps\PcvBenefitBuilder;
 
 class MemberController extends BaseController
 {
@@ -238,7 +239,6 @@ class MemberController extends BaseController
      */
     public function login(Request $request)
     {
-        
         //valid parameter 
         $validator = Validator::make($request->all(), [
             'email' => 'email|required_without_all:fb_id,gg_id',
@@ -454,5 +454,122 @@ class MemberController extends BaseController
         $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
         return $this->sendResponse( $PcvInsuredCardBuilder->get(), "OK" , 0);
     }
-    
+
+
+    public function test1(Request $request){
+        
+        $url_file = resource_path('sql/import_pcv_member.sql');
+        $sql =  file_get_contents($url_file);
+        $url_file2 = resource_path('sql/pcv_benefit_detail.sql');
+        $sql_detail =  file_get_contents($url_file2);
+        $benefits = [];
+        $HbsMember = DB::connection('hbs_pcv')->select($sql);
+        foreach ($HbsMember as $key => $item) {
+            $item = json_decode(json_encode($item), true);
+            
+            $benSchedule = [];
+            $item = $this->getExtra($item, $benefits, $sql_detail);
+            dd($item);
+        }
+    }
+
+
+    private function getExtra($item, &$benefits , $sql_detail){
+        $sql2 = "BEGIN PKG_RP.sp_benefit_schedule(:mplOid, :cur); END;";
+        $conn = oci_connect(
+            config('oracle.hbs_pcv.username'),
+            config('oracle.hbs_pcv.password'),
+            config('oracle.hbs_pcv.host') . '/' . config('oracle.hbs_pcv.database')
+        );
+        $cursor = oci_new_cursor($conn);
+
+        $item['benefit_en'] = '';
+        $item['benefit_vi'] = '';
+
+
+        if (!isset($benefits[$item['mbr_no']]))
+        {
+            $benefits[$item['mbr_no']] = [];
+        }
+        $hasBenefit = false;
+        if (!isset($benefits[$item['mbr_no']][$item['memb_eff_date']]))
+        {
+            $benefits[$item['mbr_no']][$item['memb_eff_date']] = [
+                'benefit_en' => '',
+                'benefit_vi' => ''
+            ];
+        }
+        elseif ($benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_en'] !== '')
+        {
+            $item['benefit_en'] = $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_en'];
+            $item['benefit_vi'] = $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_vi'];
+            $hasBenefit = true;
+        }
+
+        if ($hasBenefit)
+        {
+            return $item;
+        }
+
+        try
+        {
+            $mplid = $item['mepl_oid'];
+            $stid = oci_parse($conn, $sql2);
+            oci_bind_by_name($stid, ":mplOid", $mplid);
+            oci_bind_by_name($stid, ":cur", $cursor, -1, OCI_B_CURSOR);
+            oci_execute($stid);
+            oci_execute($cursor);
+            $benSchedule = [];
+            while (($row = oci_fetch_array($cursor, OCI_ASSOC + OCI_RETURN_NULLS)) != false)
+            {
+                $benSchedule["tmp"] = $row;
+            }
+        }
+        catch (Exception $e)
+        {
+            return $item;
+        }
+        $item['ben_schedule'] = null;
+        if (!empty($benSchedule))
+        {
+            
+            
+            $benDetails = DB::connection('hbs_pcv')->select(DB::raw($sql_detail, [":pla_oid" => $benSchedule['tmp']['PLAN_OID']]));
+            $benDetails = json_decode(json_encode($benDetails), true);
+            dd($benDetails); 
+            if (!empty($benDetails))
+            {
+                $benSchedule['detail'] = $benDetails[0];
+            }
+            else
+            {
+                $benSchedule['detail']['copay'] = null;
+                $benSchedule['detail']['amtperday'] = null;
+                $benSchedule['detail']['amtpervis'] = null;
+            }
+
+            $item['ben_schedule'] = json_encode($benSchedule);
+        }
+        $langs = ['en', 'vi'];
+        if (!$hasBenefit && $item['ben_schedule'] !== null)
+        {
+            try
+            {
+                foreach ($langs as $lang)
+                {
+                    // $builder = DIContainer::resolve(PcvBenefitBuilder::class, $item, $lang);
+                    $builder = new PcvBenefitBuilder($item, $lang);
+                    $benefit = $builder->get();
+                    $item['benefit_' . $lang] = $benefit === null ? null : json_encode($benefit);
+                    $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_' . $lang] = $item['benefit_' . $lang];
+                }
+            }
+            catch (Exception $e)
+            {
+                // Ignore
+            }
+        }
+
+        return $item;
+    }
 }

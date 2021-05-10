@@ -1,1 +1,0 @@
-$('#{$id}').val(JSON.stringify({$value}, null, 4));
