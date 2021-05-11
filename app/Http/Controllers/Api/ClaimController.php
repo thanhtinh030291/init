@@ -3,82 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use App\Models\MobileClaim;
+use Illuminate\Support\Facades\Auth;
 
 class ClaimController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        parent::__construct();
+        
     }
-
     /**
-     * Show the form for creating a new resource.
+     * Get a list of Claims of a mobile user
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function issues()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $user = Auth::user();
+        $issues = MobileClaim::join('mobile_claim_status', 'mobile_claim_status.id', '=', 'mobile_claim_status_id')
+            ->where('mobile_user_id', $user->id)
+            ->get()->toArray();
+        return $this->sendResponse($issues, 'OK', 0); 
     }
 }

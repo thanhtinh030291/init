@@ -14,19 +14,21 @@ class CreatePlanHbsConfig extends Migration
     public function up()
     {
         Schema::create('plan_hbs_config', function (Blueprint $table) {
-            $table->id();
-            $table->integer('plan_id');
+            $table->increments('id');
+            $table->smallInteger('plan_id');
+            $table->tinyInteger('rev_no');
             $table->string('plan_desc')->nullable();
-            $table->integer('rev_no')->nullable();
-            $table->string('url')->nullable();
-            $table->integer('ready')->default(1);
-            
+            $table->string('filename_vi')->nullable();
+            $table->string('filename_en')->nullable();
+            $table->integer('is_benefit_ready')->default(1);
             $table->string('company')->default('pcv');
+            
             $table->integer('is_deleted')->default('0');
             $table->softDeletes();
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE plan_hbs_config CHANGE plan_id plan_id INT(4) UNSIGNED ZEROFILL NOT NULL');
+        DB::statement('ALTER TABLE plan_hbs_config CHANGE plan_id plan_id SMALLINT(4) UNSIGNED ZEROFILL NOT NULL');
+        DB::statement('ALTER TABLE plan_hbs_config CHANGE rev_no rev_no TINYINT(2) UNSIGNED ZEROFILL NOT NULL');
     }
 
     /**

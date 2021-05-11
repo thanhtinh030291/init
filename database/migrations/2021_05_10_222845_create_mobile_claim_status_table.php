@@ -19,8 +19,8 @@ class CreateMobileClaimStatusTable extends Migration
                 $table->string('name', 20)->nullable();
                 $table->string('name_vi', 20);
                 $table->tinyInteger('code');
-                $table->char('crt_by', 50)->nullable();
-                $table->char('upd_by', 50)->nullable();
+                $table->string('crt_by', 50)->nullable();
+                $table->string('upd_by', 50)->nullable();
                 $table->timestamps();
             });
             DB::unprepared("
@@ -42,6 +42,7 @@ class CreateMobileClaimStatusTable extends Migration
      */
     public function down()
     {
+        DB::unprepared('DROP TRIGGER `mobile_claim_status__id`');
         Schema::dropIfExists('mobile_claim_status');
     }
 }

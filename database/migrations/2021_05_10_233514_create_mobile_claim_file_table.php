@@ -23,8 +23,8 @@ class CreateMobileClaimFileTable extends Migration
             $table->string('checksum',32)->nullable();
             $table->binary('contents')->nullable();
             $table->string('url')->nullable();
-            $table->char('crt_by', 50)->nullable();
-            $table->char('upd_by', 50)->nullable();
+            $table->string('crt_by', 50)->nullable();
+            $table->string('upd_by', 50)->nullable();
             $table->timestamps();
         });
         DB::unprepared("
@@ -46,5 +46,6 @@ class CreateMobileClaimFileTable extends Migration
     public function down()
     {
         Schema::dropIfExists('mobile_claim_file');
+        DB::unprepared('DROP TRIGGER `mobile_claim_file__id`');
     }
 }

@@ -5,6 +5,7 @@ use App\Models\User;
 use Auth;
 use App\Models\Setting;
 use App\Models\HBS_PCV_PD_PLAN;
+use App\Models\HBS_BSH_PD_PLAN;
 use App\Models\PlanHbsConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -36,10 +37,7 @@ class SettingController extends Controller
         $admin_list = User::getListIncharge();
         return view('settingManagement.index', compact('setting','admin_list'));
     }
-
-
-
-
+    
     /**
      * Update the specified resource in storage.
      *
@@ -64,28 +62,50 @@ class SettingController extends Controller
         notifi_system($text_notifi, $arr_id);
     }
     
-    public function updatePlan(Request $request){
-        $HBS_PCV_PD_PLAN = HBS_PCV_PD_PLAN::get();
-        foreach ($HBS_PCV_PD_PLAN as $key => $value) {
-            $PlanHbsConfig = PlanHbsConfig::updateOrCreate([
-                'plan_id'   => $value->ben_head,
+    public function updatePlan(Request $request)
+    {
+        $hbs_pd_plans = [
+            'HBS_PCV_PD_PLAN' => [
                 'company' => 'pcv',
-            ],[
-                'plan_id'     => $value->plan_id,
-                'rev_no'     => $value->rev_no,
-                'plan_desc'    => $value->plan_desc
-            ]);
+                'is_benefit_ready' => 1
+            ],
+            'HBS_BSH_PD_PLAN' => [
+                'company' => 'bsh',
+                'is_benefit_ready' => 0
+            ]
+        ];
+        
+        foreach ($hbs_pd_plans as $hbs => $plan) {
+            $class = "App\\Models\\{$hbs}";
+            $data = $class::get();
+            $this->_updateOrCreatePlanHbsConfig($data, $plan['company'], $plan['is_benefit_ready']);
         }
+        
         $request->session()->flash('status', "setting update success"); 
         return redirect('/admin/setting');
     }
     
-    public function updatePass(Request $request){
+    public function updatePass(Request $request)
+    {
         $MobileUser = MobileUser::all();
         foreach ($MobileUser as $key => $value) {
             
         }
     }
 
-    
+    private function _updateOrCreatePlanHbsConfig($data, $company, $is_benefit_ready)
+    {
+        foreach ($data as $row) {
+            $PlanHbsConfig = PlanHbsConfig::updateOrCreate([
+                'plan_id'   => $row->plan_id,
+                'rev_no'   => $row->rev_no,
+                'company' => $company,
+            ],[
+                'plan_id'           => $row->plan_id,
+                'rev_no'            => $row->rev_no,
+                'plan_desc'         => $row->plan_desc,
+                'is_benefit_ready'  => $is_benefit_ready,
+            ]);
+        }
+    }
 }

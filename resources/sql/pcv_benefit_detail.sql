@@ -90,7 +90,7 @@ detail AS (
         dtb."amtpervis"
     FROM detail_a dta
         JOIN detail_b dtb USING ( plan_oid )
-    WHERE plan_oid = :pla_oid
+    WHERE plan_oid = ?
 )
 SELECT *
 FROM detail

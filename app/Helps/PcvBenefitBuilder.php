@@ -28,7 +28,7 @@ class PcvBenefitBuilder
         $meplOid = $member['mepl_oid'];
         $url_file = resource_path('sql/pcv_benefit_temp.sql');
         $sql =  file_get_contents($url_file);
-        //$sql = $this->sql->pcvBenefitTemp;
+        
         if ($lang === 'vi')
         {
             $benTemp = null;
@@ -42,11 +42,14 @@ class PcvBenefitBuilder
                 $benSchedule['tmp']['TEMP_ID2']
             ];
             
-            $benTempVi = DB::connection('hbs_pcv')->select(DB::raw($sql, $params));
+            $benTempVi = DB::connection('hbs_pcv')->select($sql, $params);
             $benTempVi = json_decode(json_encode($benDetails), true);
+            
+            
             if (count($benTempVi))
             {
                 $benTempVi = $this->benefitMaternity($benTempVi, $lang);
+                dd($benTempVi);
                 $benTempVi[count($benTempVi) - 1] = $this->benTempLast($benTempVi, $lang);
                 $benSchedule['vi'] = $benTempVi;
             }
@@ -61,7 +64,7 @@ class PcvBenefitBuilder
                     number_format($benSchedule['detail']['amtpervis']) . ' đ',
                     $benSchedule['tmp']['TEMP_ID1']
                 ];
-                $benTemp =  DB::connection('hbs_pcv')->select(DB::raw($sql, $params));
+                $benTemp =  DB::connection('hbs_pcv')->select($sql, $params);
                 $benTemp = json_decode(json_encode($benDetails), true);
                 $benTemp = $this->benefitMaternity($benTemp, $lang);
                 $benTemp[count($benTemp) - 1] = $this->benTempLast($benTemp, $lang);
@@ -80,7 +83,7 @@ class PcvBenefitBuilder
                 'VND '. number_format($benSchedule['detail']['amtpervis']),
                 $benSchedule['tmp']['TEMP_ID1']
             ];
-            $benTemp =  DB::connection('hbs_pcv')->select(DB::raw($sql, $params));
+            $benTemp =  DB::connection('hbs_pcv')->select($sql, $params);
             $benTemp = json_decode(json_encode($benDetails), true);
             $benTemp = $this->benefitMaternity($benTemp, $lang);
             $benTemp[count($benTemp) - 1] = $this->benTempLast($benTemp, $lang);

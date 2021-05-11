@@ -31,8 +31,8 @@ class CreateMobileClaimTable extends Migration
                 $table->string('dependent_memb_no', 30)->nullable();
                 $table->string('fullname', 50)->nullable();
                 $table->longText('extra')->nullable();
-                $table->char('crt_by', 50)->nullable();
-                $table->char('upd_by', 50)->nullable();
+                $table->string('crt_by', 50)->nullable();
+                $table->string('upd_by', 50)->nullable();
                 $table->timestamps();
             });
             DB::unprepared("
@@ -56,5 +56,6 @@ class CreateMobileClaimTable extends Migration
     public function down()
     {
         Schema::dropIfExists('mobile_claim');
+        DB::unprepared('DROP TRIGGER `mobile_claim__id`');
     }
 }

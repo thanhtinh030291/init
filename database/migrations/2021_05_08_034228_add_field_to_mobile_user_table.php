@@ -16,7 +16,7 @@ class AddFieldToMobileUserTable extends Migration
         Schema::table('mobile_user', function (Blueprint $table) {
             $table->string('fb_id')->nullable();
             $table->string('gg_id')->nullable();
-            $table->string('company')->default('pcv');
+            // $table->string('company')->default('pcv');
         });
     }
 
@@ -31,7 +31,7 @@ class AddFieldToMobileUserTable extends Migration
             //
             $table->dropColumn('fb_id');
             $table->dropColumn('gg_id');
-            $table->dropColumn('company');
+            // $table->dropColumn('company');
         });
     }
 }

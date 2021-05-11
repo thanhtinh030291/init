@@ -20,6 +20,11 @@ use App\Helps\PcvBenefitBuilder;
 
 class MemberController extends BaseController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        
+    }
     /**
      * Register api
      *
@@ -260,9 +265,9 @@ class MemberController extends BaseController
         if($user != null){
             $success['token'] =  $user->createToken('mobile')->accessToken; 
             $success['user'] =  $user;
-            return $this->sendResponse($success, 'User login successfully.',200);
+            return $this->sendResponse($success, __('frontend.logined') ,200);
         }else{ 
-            return $this->sendError('Unauthorised.', 201);
+            return $this->sendError(__('auth.failed'), 401);
         }
     }
 
@@ -464,11 +469,11 @@ class MemberController extends BaseController
         $benefits = [];
         $HbsMember = DB::connection('hbs_pcv')->select($sql);
         foreach ($HbsMember as $key => $item) {
-            $item = json_decode(json_encode($item), true);
             
-            $benSchedule = [];
-            $item = $this->getExtra($item, $benefits, $sql_detail);
-            dd($item);
+            // $item = json_decode(json_encode($item), true);
+            // $benSchedule = [];
+            // $item = $this->getExtra($item, $benefits, $sql_detail);
+            
         }
     }
 
@@ -533,9 +538,8 @@ class MemberController extends BaseController
         {
             
             
-            $benDetails = DB::connection('hbs_pcv')->select(DB::raw($sql_detail, [":pla_oid" => $benSchedule['tmp']['PLAN_OID']]));
+            $benDetails = DB::connection('hbs_pcv')->select($sql_detail, [$benSchedule['tmp']['PLAN_OID']]);
             $benDetails = json_decode(json_encode($benDetails), true);
-            dd($benDetails); 
             if (!empty($benDetails))
             {
                 $benSchedule['detail'] = $benDetails[0];
@@ -557,6 +561,7 @@ class MemberController extends BaseController
                 foreach ($langs as $lang)
                 {
                     // $builder = DIContainer::resolve(PcvBenefitBuilder::class, $item, $lang);
+                    
                     $builder = new PcvBenefitBuilder($item, $lang);
                     $benefit = $builder->get();
                     $item['benefit_' . $lang] = $benefit === null ? null : json_encode($benefit);
@@ -565,10 +570,9 @@ class MemberController extends BaseController
             }
             catch (Exception $e)
             {
-                // Ignore
+                dd('lỗi');
             }
         }
-
         return $item;
     }
 }

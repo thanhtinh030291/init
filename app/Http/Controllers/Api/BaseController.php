@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
+use Illuminate\Http\Request;
 
 
 
@@ -40,9 +41,8 @@ class BaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendError($message = [], $code = 400)
+    public function sendError($message = [], $code = 400 , $status = 401)
     {
-        
         if(!is_array($message)){
             $errorMessages = $message;
         }else{
@@ -53,6 +53,6 @@ class BaseController extends Controller
             'code' => $code,
             'message' => $errorMessages,
         ];
-        return response()->json($response, 200);
+        return response()->json($response, $status);
     }
 }

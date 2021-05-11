@@ -17,7 +17,7 @@ class MobileClaim extends BaseModel
      * @var array
      */
 
-    public $table = 'mobile_user';
+    public $table = 'mobile_claim';
     protected $guarded = ['id'];
     public $timestamps = false;
     
@@ -27,5 +27,11 @@ class MobileClaim extends BaseModel
         'id' => 'string'
     ];
 
-
+    /**
+     * Get the phone associated with the user.
+     */
+    // public function mobile_status()
+    // {
+        // return $this->hasOne(MobileClaimStatus::class, 'id' ,'mobile_claim_status_id');
+    // }
 }

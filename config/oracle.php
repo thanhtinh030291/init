@@ -15,4 +15,18 @@ return [
         'edition'        => env('DB_EDITION', 'ora$base'),
         'server_version' => env('DB_SERVER_VERSION', '11g'),
     ],
+    'hbs_bsh' => [
+        'driver'         => 'oracle',
+        'tns'            => env('DB_HBS_BSH_TNS', ''),
+        'host'           => env('DB_HBS_BSH_HOST', ''),
+        'port'           => env('DB_HBS_BSH_PORT', '1521'),
+        'database'       => env('DB_HBS_BSH_DATABASE', ''),
+        'username'       => env('DB_HBS_BSH_USERNAME', ''),
+        'password'       => env('DB_HBS_BSH_PASSWORD', ''),
+        'charset'        => env('DB_HBS_BSH_CHARSET', 'AL32UTF8'),
+        'prefix'         => env('DB_HBS_BSH_PREFIX', ''),
+        'prefix_schema'  => env('DB_HBS_BSH_SCHEMA_PREFIX', ''),
+        'edition'        => env('DB_EDITION', 'ora$base'),
+        'server_version' => env('DB_SERVER_VERSION', '11g'),
+    ],
 ];

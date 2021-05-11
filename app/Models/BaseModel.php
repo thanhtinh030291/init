@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 use App\Http\Traits\FindByFieldType;
 
 class BaseModel extends Model
 {
-    use SoftDeletes;
+
     use FindByFieldType;
     /**
      * Overwrite method delete of query builder
