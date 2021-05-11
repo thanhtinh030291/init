@@ -43,26 +43,35 @@ class GetMemberHbs extends Command
     public function handle()
     {
         dump("JoBName : Get Member Hbs");
-        dump("start : " . Carbon::now());
+        dump("-------------Start : " . Carbon::now());
         $url_file = resource_path('sql/import_pcv_member.sql');
         $sql =  file_get_contents($url_file);
-        $benefits = [];
-        $HbsMember = DB::connection('hbs_pcv')->select($sql);
-        $i = 0;
-        $collection = json_decode(json_encode($HbsMember), true);
-        $chunks = array_chunk($collection,500);
-        try {
-            DB::beginTransaction();
-            DB:: table('hbs_member')->truncate();
-            foreach ($chunks as $key => $value) {
-                DB::table('hbs_member')->insert($value);
-                dump("End Time: " . Carbon::now());
+        $arr = [
+            'hbs_pcv' => 'pcv',
+            'hbs_bsh' => 'bsh'
+        ];
+        DB:: table('hbs_member')->truncate();
+        foreach ($arr as $key => $value) {
+            $HbsMember = DB::connection($key)->select($sql,[$value]);
+            $i = 0;
+            $collection = json_decode(json_encode($HbsMember), true);
+            $chunks = array_chunk($collection,500);
+            try {
+                DB::beginTransaction();
+                foreach ($chunks as $key2 => $value2) {
+                    $num_row = count($value2);
+                    DB::table('hbs_member')->insert($value2);
+                    dump("Success Time: " .$i. "..".$value."..: ".$num_row);
+                    $i++;
+                }
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollback();
+                dump("Failed Time: " .$i. "..".$value."..:");
             }
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollback();
         }
-        dump("End : " . $i ."---" .Carbon::now() ."--insert-" );
+        
+        dump("-----------End : " .Carbon::now() );
         $this->info('Cron Get Member Hbs Run successfully!');
     }
 }

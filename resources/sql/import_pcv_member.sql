@@ -224,7 +224,7 @@ member_eff_dates AS
     )
 )
 SELECT DISTINCT
-    'pcv' "company",
+    ? "company",
     memb.pocy_no "pocy_no",
     memb.pocy_ref_no "pocy_ref_no",
     memb.mbr_no "mbr_no",
