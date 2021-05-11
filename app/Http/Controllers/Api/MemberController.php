@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController;
 use App\Models\MobileUser;
 use App\Models\HbsMember;
 use Illuminate\Support\Facades\Auth;
@@ -470,9 +469,11 @@ class MemberController extends BaseController
         $HbsMember = DB::connection('hbs_pcv')->select($sql);
         foreach ($HbsMember as $key => $item) {
             
-            // $item = json_decode(json_encode($item), true);
-            // $benSchedule = [];
-            // $item = $this->getExtra($item, $benefits, $sql_detail);
+            $item = json_decode(json_encode($item), true);
+            
+            $benSchedule = [];
+            $item = $this->getExtra($item, $benefits, $sql_detail);
+            dd($item);
             
         }
     }
@@ -553,26 +554,26 @@ class MemberController extends BaseController
 
             $item['ben_schedule'] = json_encode($benSchedule);
         }
-        $langs = ['en', 'vi'];
-        if (!$hasBenefit && $item['ben_schedule'] !== null)
-        {
-            try
-            {
-                foreach ($langs as $lang)
-                {
-                    // $builder = DIContainer::resolve(PcvBenefitBuilder::class, $item, $lang);
+        // $langs = ['en', 'vi'];
+        // if (!$hasBenefit && $item['ben_schedule'] !== null)
+        // {
+        //     try
+        //     {
+        //         foreach ($langs as $lang)
+        //         {
+        //             // $builder = DIContainer::resolve(PcvBenefitBuilder::class, $item, $lang);
                     
-                    $builder = new PcvBenefitBuilder($item, $lang);
-                    $benefit = $builder->get();
-                    $item['benefit_' . $lang] = $benefit === null ? null : json_encode($benefit);
-                    $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_' . $lang] = $item['benefit_' . $lang];
-                }
-            }
-            catch (Exception $e)
-            {
-                dd('lỗi');
-            }
-        }
+        //             $builder = new PcvBenefitBuilder($item, $lang);
+        //             $benefit = $builder->get();
+        //             $item['benefit_' . $lang] = $benefit === null ? null : json_encode($benefit);
+        //             $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_' . $lang] = $item['benefit_' . $lang];
+        //         }
+        //     }
+        //     catch (Exception $e)
+        //     {
+        //         dd('lỗi');
+        //     }
+        // }
         return $item;
     }
 }

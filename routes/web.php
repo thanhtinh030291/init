@@ -1,13 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\HbsPlanConfigController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -26,23 +20,23 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('home', 'HomeController@index')->name('home');;
-        Route::resource('user', UserController::class);
-        Route::resource('role', RoleController::class);
-        Route::resource('menu', MenuController::class);
+        Route::resource('user', 'App\Http\Controllers\UserController');
+        Route::resource('role', 'App\Http\Controllers\RoleController');
+        Route::resource('menu', 'App\Http\Controllers\MenuController');
         //mesage
-        Route::resource('message', MessageController::class);
-        Route::post('message/destroyMany', [MessageController::class, 'destroyMany'])->name('message.destroyMany');
-        Route::get('/sent', [MessageController::class, 'sent'])->name('message.sent');
-        Route::get('/trash', [MessageController::class, 'trash'])->name('message.trash');
-        Route::post('message/important', [MessageController::class, 'important'])->name('message.important');
+        Route::resource('message', 'App\Http\Controllers\MessageController');
+        Route::post('message/destroyMany', 'App\Http\Controllers\MessageController@destroyMany')->name('message.destroyMany');
+        Route::get('/sent', 'App\Http\Controllers\MessageController@sent')->name('message.sent');
+        Route::get('/trash', 'App\Http\Controllers\MessageController@trash')->name('message.trash');
+        Route::post('message/important', 'App\Http\Controllers\MessageController@important')->name('message.important');
         
         //Settings
-        Route::get('setting',  [SettingController::class, 'index'])->name('setting.index');
-        Route::post('setting/update',[SettingController::class, 'update']);
-        Route::post('setting/updatePlan',[SettingController::class, 'updatePlan']);
+        Route::get('setting',  'App\Http\Controllers\SettingController@index')->name('setting.index');
+        Route::post('setting/update','App\Http\Controllers\SettingController@update');
+        Route::post('setting/updatePlan','App\Http\Controllers\SettingController@updatePlan');
 
         //plan hbs
-        Route::resource('hbsplan', HbsPlanConfigController::class);
+        Route::resource('hbsplan', 'App\Http\Controllers\HbsPlanConfigController');
         
     });
 });

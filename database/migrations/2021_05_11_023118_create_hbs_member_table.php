@@ -16,7 +16,7 @@ class CreateHbsMemberTable extends Migration
         Schema::create('hbs_member', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->char('company',20)->default('pcv');
-            $table->mediumText('note');
+            $table->mediumText('note')->nullable();
             $table->string('pocy_no',20);
             $table->string('pocy_ref_no',30)->nullable();
             $table->string('mbr_no',20);
@@ -62,8 +62,12 @@ class CreateHbsMemberTable extends Migration
             $table->tinyInteger('is_policy_holder')->nullable();
             $table->char('crt_by', 50)->nullable();
             $table->char('upd_by', 50)->nullable();
+            $table->smallInteger('plan_id');
+            $table->tinyInteger('rev_no');
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE hbs_member CHANGE plan_id plan_id SMALLINT(4) UNSIGNED ZEROFILL NOT NULL');
+        DB::statement('ALTER TABLE hbs_member CHANGE rev_no rev_no TINYINT(2) UNSIGNED ZEROFILL NOT NULL');
         DB::unprepared("
             CREATE TRIGGER `hbs_member__id` 
             BEFORE INSERT ON `hbs_member`
