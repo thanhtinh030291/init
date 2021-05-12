@@ -17,4 +17,7 @@ class HbsMember extends Model
         $diffYears = Carbon::now()->diffInYears($dbDate);
         return $diffYears;
     }
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

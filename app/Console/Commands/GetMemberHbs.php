@@ -48,13 +48,15 @@ class GetMemberHbs extends Command
         $sql =  file_get_contents($url_file);
         $arr = [
             'hbs_pcv' => 'pcv',
-            'hbs_bsh' => 'bsh'
+            //'hbs_bsh' => 'bsh'
         ];
         DB:: table('hbs_member')->truncate();
         foreach ($arr as $key => $value) {
             $HbsMember = DB::connection($key)->select($sql,[$value]);
             $i = 0;
+            dump("sss");
             $collection = json_decode(json_encode($HbsMember), true);
+            dump("ssss");
             $chunks = array_chunk($collection,500);
             try {
                 DB::beginTransaction();

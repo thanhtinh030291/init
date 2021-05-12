@@ -21,9 +21,9 @@ class CreateHbsMemberTable extends Migration
             $table->string('pocy_ref_no',30)->nullable();
             $table->string('mbr_no',20);
             $table->string('memb_ref_no',30)->nullable();
-            $table->string('mbr_last_name',255)->nullable();
-            $table->string('mbr_mid_name',255)->nullable();
-            $table->string('mbr_first_name',255)->nullable();
+            $table->string('mbr_last_name',255)->collation('utf8_unicode_ci')->nullable();
+            $table->string('mbr_mid_name',255)->collation('utf8_unicode_ci')->nullable();
+            $table->string('mbr_first_name',255)->collation('utf8_unicode_ci')->nullable();
             $table->date('dob')->nullable();
             $table->char('gender',10)->default('M');
             $table->char('email',255)->nullable();

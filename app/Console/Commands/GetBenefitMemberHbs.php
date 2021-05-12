@@ -48,12 +48,14 @@ class GetBenefitMemberHbs extends Command
             config('oracle.hbs_pcv.host') . '/' . config('oracle.hbs_pcv.database')
         );
         $cursor = oci_new_cursor($conn);
-        $HbsMember = HbsMember::where('company' = 'pcv')->whereIsNull('ben_schedule')->get();
+        $HbsMember = HbsMember::where('company','pcv')->whereNull('ben_schedule')->get();
+        dump("JoBName : Get Member Hbs");
+        dump("-------------Start : " . Carbon::now());
         foreach ($HbsMember as $key => $value) {
             try
             {
                 $mplid = $value->mepl_oid;
-                $stid = oci_parse($conn, $sql2);
+                $stid = oci_parse($conn, $sql);
                 oci_bind_by_name($stid, ":mplOid", $mplid);
                 oci_bind_by_name($stid, ":cur", $cursor, -1, OCI_B_CURSOR);
                 oci_execute($stid);
@@ -83,10 +85,11 @@ class GetBenefitMemberHbs extends Command
                     $benSchedule['detail']['amtperday'] = null;
                     $benSchedule['detail']['amtpervis'] = null;
                 }
-
                 $benSchedule = json_encode($benSchedule);
                 HbsMember::where('id', $value->id)->update(['ben_schedule' => $benSchedule]);
             }
         }
+        dump("-----------End : " .Carbon::now() );
+        $this->info('Cron Get Member Hbs Run successfully!');
     }
 }

@@ -49,7 +49,6 @@ class PcvBenefitBuilder
             if (count($benTempVi))
             {
                 $benTempVi = $this->benefitMaternity($benTempVi, $lang);
-                dd($benTempVi);
                 $benTempVi[count($benTempVi) - 1] = $this->benTempLast($benTempVi, $lang);
                 $benSchedule['vi'] = $benTempVi;
             }
@@ -84,10 +83,12 @@ class PcvBenefitBuilder
                 $benSchedule['tmp']['TEMP_ID1']
             ];
             $benTemp =  DB::connection('hbs_pcv')->select($sql, $params);
-            $benTemp = json_decode(json_encode($benDetails), true);
+           
+            $benTemp = json_decode(json_encode($benTemp), true);
             $benTemp = $this->benefitMaternity($benTemp, $lang);
             $benTemp[count($benTemp) - 1] = $this->benTempLast($benTemp, $lang);
             $benSchedule['en'] = $benTemp;
+           
         }
 
         if (empty($benSchedule[$lang]))
@@ -176,24 +177,25 @@ class PcvBenefitBuilder
             $dtSplit = '-----------';
             $lmSplit = '----------------------';
         }
-
+        
         $benSchedule = end($benefits);
         if (!is_array($benSchedule))
         {
             throw new Exception('Not an array');
         }
 
-        $detail = explode($dtSplit, trim($benSchedule['DETAIL']));
+
+        $detail = explode($dtSplit, trim($benSchedule['detail']));
         $detail2 = explode("\r\n", $detail[count($detail)-1]);
-        if(strpos($benSchedule['DETAIL'], $dtSplit)){
+        if(strpos($benSchedule['detail'], $dtSplit)){
             $detail2[0] = $detail[0];
         }
         $detail = $detail2;
 
-        $limit = explode($lmSplit, trim($benSchedule['LIMIT']));
+        $limit = explode($lmSplit, trim($benSchedule['limit']));
         $limit2 = explode("\r\n", $limit[count($limit) - 1]);
 
-        if(strpos($benSchedule['LIMIT'], $dtSplit)){
+        if(strpos($benSchedule['limit'], $dtSplit)){
             $limit2[0] = $limit[0];
         }
         $limit = $limit2;
@@ -202,8 +204,8 @@ class PcvBenefitBuilder
         {
             $combine = array_combine($detail, $limit);
         }
-        $benSchedule['DETAIL'] = $combine;
-        $benSchedule['LIMIT'] = null;
+        $benSchedule['detail'] = $combine;
+        $benSchedule['limit'] = null;
         return $benSchedule;
     }
 
@@ -222,8 +224,8 @@ class PcvBenefitBuilder
             return $benefits;
         }
         $maternity = $benefits[$maternity_id];
-        $details = explode("\r\n", $maternity['DETAIL']);
-        $limits = explode("\r\n", $maternity['LIMIT']);
+        $details = explode("\r\n", $maternity['detail']);
+        $limits = explode("\r\n", $maternity['limit']);
 
         unset($limits[0], $limits[1]);
         do {
@@ -235,8 +237,8 @@ class PcvBenefitBuilder
             $combine = array_combine($details, $limits);
         }
         if(!is_null($combine)){
-            $benefits[$maternity_id]['DETAIL'] = $combine;
-            $benefits[$maternity_id]['LIMIT'] = null;
+            $benefits[$maternity_id]['detail'] = $combine;
+            $benefits[$maternity_id]['limit'] = null;
         }
         return $benefits;
     }
@@ -365,7 +367,7 @@ class PcvBenefitBuilder
             {
                 $noLang = 1;
             }
-            $result[]['DETAIL'] = $value[$keyLang];
+            $result[]['detail'] = $value[$keyLang];
         }
 
         if (!$noLang)
@@ -384,8 +386,8 @@ class PcvBenefitBuilder
         $benSchedule = [];
         $benPa = HBS_PCV_MR_MEMBER::select('sum_insured')->where('mepl_oid',$meplOid)->get()->toArray();
         $benSchedule['HEADING'] = "** PERSONAL ACCIDENT BENEFITS **";
-        $benSchedule['DETAIL'] = null;
-        $benSchedule['LIMIT'] = $this->currencyFormat($benPa[0]['SUM_INSURED'], $lang);
+        $benSchedule['detail'] = null;
+        $benSchedule['limit'] = $this->currencyFormat($benPa[0]['SUM_INSURED'], $lang);
 
         if ($lang == 'vi')
         {

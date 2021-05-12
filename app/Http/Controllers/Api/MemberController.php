@@ -22,7 +22,6 @@ class MemberController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        
     }
     /**
      * Register api
@@ -37,28 +36,28 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError($validator->errors()->all() , 201 );       
+            return $this->sendError($validator->errors()->all() , 400 , 400);       
         }
         
         $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->count();
         
         if($HbsMember == 0){
-            return $this->sendError(__('frontend.pocy_not_exist') , 201 );       
+            return $this->sendError(__('frontend.pocy_not_exist') , 400, 400 );       
         }
 
         $HbsMember = HbsMember::select('mbr_no','company')->where('pocy_no', $request->pocy_no)->where('email', $request->email)->distinct()->get();
         if($HbsMember->count() != 1){
-            return $this->sendError('Please use eKYC', 10 );       
+            return $this->sendError('Please use eKYC', 10 , 200 );       
         }
 
         $MobileUser = MobileUser::where('mbr_no', $HbsMember[0]->mbr_no )->orWhere('email', $request->email)->count();
         if ($MobileUser != 0) {
-            return $this->sendError(__('frontend.account_exist'), 101 );
+            return $this->sendError(__('frontend.account_exist'), 405 , 400);
         }
 
         $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->where('email', $request->email)->first();
         if($HbsMember->age < config('min_age_use_app')){
-            return $this->sendError(__('frontend.member_not_exist'), 101 );
+            return $this->sendError(__('frontend.member_not_exist'), 406 , 400);
         }
         
         try {
@@ -106,7 +105,7 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError($validator->errors()->all() , 201 );       
+            return $this->sendError($validator->errors()->all() , 400 ,400 );       
         }
         $lang = App::isLocale('en') ? 'en' : 'vi';
         
@@ -115,7 +114,7 @@ class MemberController extends BaseController
         $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->count();
         
         if($HbsMember == 0){
-            return $this->sendError(__('frontend.pocy_not_exist') , 201 );       
+            return $this->sendError(__('frontend.pocy_not_exist') , 400 ,400);       
         }
 
         $body_face_matching = [
@@ -146,13 +145,13 @@ class MemberController extends BaseController
             $response_ocr = $client->request("POST", config("constants.URL_API_EKYC")."/api/v2/ekyc/cards?format_type=base64&get_thumb=false" , ['json'=>$body_face_orc]);
             $response_ocr =  json_decode($response_ocr->getBody()->getContents());
             if($response_ocr->errorCode != 0){
-                return $this->sendError($response_ocr->errorMessage , $response_ocr->errorCode );
+                return $this->sendError($response_ocr->errorMessage , 400 ,400 );
             }else{
                 if(isset($response_ocr->data[1])){
                     $mbr_name = strtoupper(vn_to_str($response_ocr->data[1]->info->name));
                     $dob = $response_ocr->data[1]->info->dob;
                 }else{
-                    return $this->sendError(__("frontend.id_font_requid") , 201 );
+                    return $this->sendError(__("frontend.id_font_requid") , 400 , 400 );
                 }
             }
             //match_face
@@ -162,7 +161,7 @@ class MemberController extends BaseController
             if($response_match->data->invalidCode != 0 && $response_match->data->matching <= 75){
                 return $this->sendError(config("mess_match_".$lang.".".$response_match->data->invalidCode) , $response_match->data->invalidCode );
             }elseif($response_match->data->matching <= 75){
-                return $this->sendError(__('frontend.ekyc_not_match') , 201 );
+                return $this->sendError(__('frontend.ekyc_not_match') , 400 , 400);
             }
             
         } catch (\Throwable $th) {
@@ -184,25 +183,33 @@ class MemberController extends BaseController
         }elseif(date_create_from_format('d m Y', $dob)){
             $dob = date_create_from_format('d m Y', $dob)->format('Y-m-d');
         }else{
-            return $this->sendError(__('frontend.id_font_requid') , 201 );
+            return $this->sendError(__('frontend.id_font_requid') , 400 , 400 );
+        }
+        $array_name = explode(" ", strtoupper($mbr_name));
+
+        $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->where('dob', $dob);
+
+        foreach ($array_name as $key => $value) {
+            $HbsMember = $HbsMember->where(function($q) use($value){
+                $q->where('mbr_last_name','like', '%' . $value . '%')
+                  ->orWhere('mbr_mid_name','like', '%' . $value . '%')
+                  ->orWhere('mbr_first_name','like', '%' . $value . '%');
+            });
         }
 
-        $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)
-                    ->whereRaw("UPPER(TRIM(CONCAT(`mbr_first_name`,' ', `mbr_mid_name` , ' ',`mbr_last_name`))) = ?", strtoupper(vn_to_str($mbr_name)))
-                    ->where('dob', $dob)->first();
         if($HbsMember == null){
-            return $this->sendError(__('frontend.invalid_effect_member'), 99 );
+            return $this->sendError(__('frontend.invalid_effect_member'), 400 , 400 );
         }
         $mbr_no = $HbsMember->mbr_no;
         
         $MobileUser = MobileUser::where('mbr_no', $mbr_no )->count();
         if ($MobileUser != 0) {
-            return $this->sendError(__('frontend.account_exist'), 101 );
+            return $this->sendError(__('frontend.account_exist'), 400 , 400 );
         }
 
         
         if($HbsMember->age < config('min_age_use_app')){
-            return $this->sendError(__('frontend.member_not_exist'), 101 );
+            return $this->sendError(__('frontend.member_not_exist'), 400 , 400 );
         }
         
         try {
@@ -251,7 +258,7 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError($validator->errors()->all() , 201 );       
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
         }
         if($request->email != null){
             $user = MobileUser::where('email', $request->email)->where('password', hashpass($request->password))->first();
@@ -264,7 +271,7 @@ class MemberController extends BaseController
         if($user != null){
             $success['token'] =  $user->createToken('mobile')->accessToken; 
             $success['user'] =  $user;
-            return $this->sendResponse($success, __('frontend.logined') ,200);
+            return $this->sendResponse($success, __('frontend.logined') , 0 );
         }else{ 
             return $this->sendError(__('auth.failed'), 401);
         }
@@ -282,12 +289,12 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError($validator->errors()->all() , 201 );       
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
         }
 
         $user = MobileUser::where('email', $request->email)->first();
         if($user == null){
-            return $this->sendError(__('frontend.account_not_exist'), 2);
+            return $this->sendError(__('frontend.account_not_exist'), 400 , 400);
         }
         try {
             DB::beginTransaction();
@@ -318,7 +325,7 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError(__('frontend.invalid_photo') , 201 );       
+            return $this->sendError(__('frontend.invalid_photo') , 400 , 400 );       
         }
         $user = Auth::user();
         $path = config('constants.photoUpload');
@@ -346,7 +353,7 @@ class MemberController extends BaseController
         $user = Auth::user();
         $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->get()->toArray();
         if(empty($HbsMember)){
-            return $this->sendError(__('frontend.internal_server_error'), 500 );
+            return $this->sendError(__('frontend.internal_server_error'), 400,400);
         }
         $pocyYears = [];
         foreach ($HbsMember as $row) {

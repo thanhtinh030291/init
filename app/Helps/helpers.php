@@ -135,15 +135,20 @@ function sendEmail($user_send, $data , $template , $subject)
     }
     $app_name  = config('constants.appName');
     $app_email = config('constants.appEmail');
+    $env = config('app.debug');
+    $env_email = config('constants.debugEmail');
     Mail::send(
         $template, 
         [
             'user' => $user_send, 
             'data' => $data 
-        ], function ($mail) use ($user_send, $app_name, $app_email, $subject) {
-            $mail
-                ->to($user_send->email, $user_send->name)
-                ->subject($subject);
+        ], function ($mail) use ($user_send, $app_name, $app_email, $subject , $env , $env_email) {
+            if($env == false){
+                $mail->to($user_send->email, $user_send->name)->subject($subject);
+            }else{
+                $mail->to($env_email, 'IT INQU')->subject($subject);
+            }
+            
         }
     );
     return true;
