@@ -201,13 +201,13 @@ function loadImg($imageName = null, $dir = null) {
     if (strlen(strstr($imageName, '.')) > 0) {
         return $dir . $imageName;
     } else {
-        return '/images/noimage.png';
+        return '/img/noimage.png';
     }
 }
 
 function loadAvantarUser($avantar){
     if($avantar == 'admin.png'){
-        return '/images/noimage.png';
+        return '/img/noimage.png';
     }else{
         return loadImg($avantar, config('constants.avantarStorage').'thumbnail/');
     }

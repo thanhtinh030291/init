@@ -37,7 +37,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         //plan hbs
         Route::resource('hbsplan', 'App\Http\Controllers\HbsPlanConfigController');
-        
+
+        //moblie user
+        Route::resource('mobileuser', 'App\Http\Controllers\MobileUserController');
     });
 });
 
