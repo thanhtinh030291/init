@@ -13,7 +13,7 @@ class GetBenefitMemberHbs extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'command:GetBenefitMemberHbs';
 
     /**
      * The console command description.
