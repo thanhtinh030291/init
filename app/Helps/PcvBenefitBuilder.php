@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Helps\PcvBenefitBuilder;
 use App\Models\HBS_PCV_MR_MEMBER;
+use App\Models\HBS_PCV_MR_MEMBER_PLAN;
 use App\Models\HBS_PCV_MR_MEMBER_PLAN_RESTRICTION;
 /**
  * Convert Data To Benefit
@@ -43,7 +44,7 @@ class PcvBenefitBuilder
             ];
             
             $benTempVi = DB::connection('hbs_pcv')->select($sql, $params);
-            $benTempVi = json_decode(json_encode($benDetails), true);
+            $benTempVi = json_decode(json_encode($benTempVi), true);
             
             
             if (count($benTempVi))
@@ -64,7 +65,7 @@ class PcvBenefitBuilder
                     $benSchedule['tmp']['TEMP_ID1']
                 ];
                 $benTemp =  DB::connection('hbs_pcv')->select($sql, $params);
-                $benTemp = json_decode(json_encode($benDetails), true);
+                $benTemp = json_decode(json_encode($benTemp), true);
                 $benTemp = $this->benefitMaternity($benTemp, $lang);
                 $benTemp[count($benTemp) - 1] = $this->benTempLast($benTemp, $lang);
                 $benSchedule['vi'] = $benTemp;
@@ -96,7 +97,7 @@ class PcvBenefitBuilder
             $this->data = null;
             return;
         }
-
+        
         $count = count($benSchedule[$lang]);
         if (!empty($benSchedule['tmp']['TAL']))
         {
@@ -115,15 +116,15 @@ class PcvBenefitBuilder
 
         $headD = [];
         $head = [];
-        $title = 'Heading';
+        $title = 'heading';
         $titleH = $title;
         $i = 0;
 
         foreach ($benSchedule[$lang] as $key => $row)
         {
-            if ( (!empty($row['HEADING']) && strpos($row['HEADING'], '** ') !== false))
+            if ( (!empty($row['heading']) && strpos($row['heading'], '** ') !== false))
             {
-                $title = $this->convertBenhead($row['HEADING'], $lang);
+                $title = $this->convertBenhead($row['heading'], $lang);
                 if (!empty($head))
                 {
                     $headD[$titleH] = $head;
@@ -179,6 +180,7 @@ class PcvBenefitBuilder
         }
         
         $benSchedule = end($benefits);
+        
         if (!is_array($benSchedule))
         {
             throw new Exception('Not an array');
@@ -218,7 +220,7 @@ class PcvBenefitBuilder
         } else {
             $search_str = 'Quyền lợi thai sản ';
         }
-        $maternity_id = array_search($search_str, array_column($benefits, 'HEADING'));
+        $maternity_id = array_search($search_str, array_column($benefits, 'heading'));
 
         if(!$maternity_id){
             return $benefits;
@@ -347,20 +349,19 @@ class PcvBenefitBuilder
         ->where('scma_oid_restriction_code','RESTRICTION_EXCL')->orderBy('mers_oid')->get()->toArray();
         
 
-        $keyLang = 'RSTR_DESC';
+        $keyLang = 'rstr_desc';
         $result = [];
         $noLang = 0;
 
         if ($lang == 'vi')
         {
-            $keyLang = 'RSTR_DESC_VN';
-            $result[]['HEADING'] ="Loại trừ/ ghi chú";
+            $keyLang = 'rstr_desc_vn';
+            $result[]['heading'] ="Loại trừ/ ghi chú";
         }
         else
         {
-            $result[]['HEADING'] ='RESTRICTION/ NOTE';
+            $result[]['heading'] ='RESTRICTION/ NOTE';
         }
-
         foreach ($mers as $key => $value)
         {
             if (!$noLang && isset($value[$keyLang]))
@@ -384,14 +385,14 @@ class PcvBenefitBuilder
     private function getMemberPlanPa($meplOid, $lang = 'en')
     {
         $benSchedule = [];
-        $benPa = HBS_PCV_MR_MEMBER::select('sum_insured')->where('mepl_oid',$meplOid)->get()->toArray();
-        $benSchedule['HEADING'] = "** PERSONAL ACCIDENT BENEFITS **";
+        $benPa = HBS_PCV_MR_MEMBER_PLAN::select('sum_insured')->where('mepl_oid',$meplOid)->get()->toArray();
+        $benSchedule['heading'] = "** PERSONAL ACCIDENT BENEFITS **";
         $benSchedule['detail'] = null;
-        $benSchedule['limit'] = $this->currencyFormat($benPa[0]['SUM_INSURED'], $lang);
+        $benSchedule['limit'] = $this->currencyFormat($benPa[0]['sum_insured'], $lang);
 
         if ($lang == 'vi')
         {
-            $benSchedule['HEADING'] = "** QUYỀN LỢI TAI NẠN CÁ NHÂN **";
+            $benSchedule['heading'] = "** QUYỀN LỢI TAI NẠN CÁ NHÂN **";
         }
 
         return $benSchedule;

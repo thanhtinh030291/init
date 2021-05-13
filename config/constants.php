@@ -2,13 +2,13 @@
 return[
     'appName' => 'Mobile Assistant',
     'appEmail' => env('MAIL_FROM_ADDRESS', 'admin@pacificcross.com.vn'),
-    'debugEmail' => 'inquiry@pacificcross.com.vn',
+    'debugEmail' => 'thanhtinh030291@gmail.com',
     'appLogo'     => "/img/logo.png",
     'srcUpload'   => '/public/upload/',
     'srcStorage'  => '/storage/upload/',
     'photoUpload'   => '/public/photo/',
     'photoStorage'  => '/storage/photo/',
-    
+    'majorityAge' => 23,
     'paginator' => [
         'itemPerPage' => '10',
     ],

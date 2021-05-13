@@ -29,11 +29,27 @@ class CreateMobileUserTable extends Migration
             $table->tinyInteger('member_type')->default(1);
             $table->string('fb_id',255)->nullable();
             $table->string('gg_id',255)->nullable();
+            $table->string('apple_id',255)->nullable();
+            $table->string('id_card',255)->nullable();
+            $table->string('front_card_url',255)->nullable();
+            $table->string('back_card_url',255)->nullable();
+            $table->char('resoure',10)->nullable();
+            $table->timestamp('first_login')->nullable();
+            $table->timestamp('last_login')->nullable();
             $table->char('company',20)->default('pcv');
             $table->char('crt_by', 50)->nullable();
             $table->char('upd_by', 50)->nullable();
             $table->timestamps();
         });
+        DB::unprepared("
+            CREATE TRIGGER `mobile_user__id` 
+            BEFORE INSERT ON `mobile_user`
+            FOR EACH ROW 
+                BEGIN IF NEW.id IS NULL OR NEW.id = '' THEN SET NEW.id = UUID(); 
+                END IF; 
+                SET @last_uuid = NEW.id
+                ; END
+            ");
     }
 
     /**
@@ -43,6 +59,7 @@ class CreateMobileUserTable extends Migration
      */
     public function down()
     {
+        DB::unprepared('DROP TRIGGER `mobile_user__id`');
         Schema::dropIfExists('mobile_user');
     }
 }

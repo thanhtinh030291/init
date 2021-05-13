@@ -52,6 +52,19 @@ function saveImageBase64 ($base64 , $path , $oldFile = null){
     return $fileName;
 }
 
+function getImageBase64 ($path){
+    
+    if (!File::exists(storage_path("app".$path)))
+    {
+        return null;
+    }
+
+    $uri = storage_path("app".$path); 
+    $type = pathinfo($uri, PATHINFO_EXTENSION);
+    $data = file_get_contents($uri);
+    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    return  $base64;
+}
 function saveFile($file ,$path ,$oldFile = null)
 {
     if($oldFile){
@@ -135,20 +148,19 @@ function sendEmail($user_send, $data , $template , $subject)
     }
     $app_name  = config('constants.appName');
     $app_email = config('constants.appEmail');
+    $debugEmail = config('constants.debugEmail');
     $env = config('app.debug');
-    $env_email = config('constants.debugEmail');
     Mail::send(
         $template, 
         [
             'user' => $user_send, 
             'data' => $data 
-        ], function ($mail) use ($user_send, $app_name, $app_email, $subject , $env , $env_email) {
+        ], function ($mail) use ($user_send, $app_name, $app_email, $subject,$env,$debugEmail) {
             if($env == false){
                 $mail->to($user_send->email, $user_send->name)->subject($subject);
             }else{
-                $mail->to($env_email, 'IT INQU')->subject($subject);
+                $mail->to($debugEmail, $user_send->name)->subject($subject);
             }
-            
         }
     );
     return true;

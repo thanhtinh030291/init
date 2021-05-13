@@ -49,6 +49,9 @@
         [add value to file .env]
         PASSPORT_PERSONAL_ACCESS_CLIENT_ID="client-id-value"
         PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET="unhashed-client-secret-value"
+        [clear cache]
+        php artisan config:cache
+        
  #Bước 8 : Run App
         php artisan serve  
         default (127.0.0.1:8000)
@@ -59,8 +62,9 @@
     sudo service cron reload 
 
 ## Lấy Dữ liệu từ HBS
-    php artisan command:GetMemberHbs   
+    php artisan command:GetMemberHbs
         (Lấy toàn bộ thông tin user HBS ghi vào bảng hbs_member)
     php artisan command:GetBenefitMemberHbs  
         (Lấy benefit scheduler default của user ghi vào bảng hbs_member)
-
+    php artisan command:CoverBenefitHbs
+        (Lấy benefit scheduler default của user chinh sua )
