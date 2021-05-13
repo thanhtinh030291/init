@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MobileClaim extends BaseModel
+class MobileUserBankAccount extends BaseModel
 {
     
     use HasFactory;
@@ -17,7 +17,7 @@ class MobileClaim extends BaseModel
      * @var array
      */
 
-    public $table = 'mobile_claim';
+    public $table = 'mobile_user_bank_account';
     protected $guarded = ['id'];
     
 

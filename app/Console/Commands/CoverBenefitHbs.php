@@ -41,13 +41,22 @@ class CoverBenefitHbs extends Command
      */
     public function handle()
     {
-        $HbsMember = HbsMember::where('company','pcv')->whereNull('benefit_en')->first();
+        $HbsMember = HbsMember::where('company','pcv')->whereNull('benefit_en')->get();
         $langs = ['en', 'vi'];
-        foreach ($langs as $lang)
-        {
-            $builder = new PcvBenefitBuilder($HbsMember, $lang);
-            $benefit = $builder->get();
-            dd($benefit);
+        foreach ($HbsMember as $key => $value) {
+            foreach ($langs as $lang)
+                {   try {
+                    $builder = new PcvBenefitBuilder($value, $lang);
+                    $benefit = json_encode($builder->get());
+                    HbsMember::where('id' , $value->id)->update([
+                        "benefit_".$lang => $benefit
+                    ]);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
+                
+            }
         }
+        
     }
 }

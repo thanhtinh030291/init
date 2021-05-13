@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Models\MobileUser;
 use App\Models\HbsMember;
+use App\Models\MobileUserBankAccount;
+use App\Models\MobileDevice;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Validation\Rule;
@@ -22,10 +24,11 @@ class MemberController extends BaseController
     public function __construct()
     {
         parent::__construct();
+        
     }
     /**
      * Register api
-     *
+     * post
      * @return \Illuminate\Http\Response
      */
     public function register(Request $request)
@@ -62,10 +65,10 @@ class MemberController extends BaseController
         
         try {
             DB::beginTransaction();
-            $password = Str::random(8);
+            $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $fullname = $HbsMember->mbr_first_name ? $HbsMember->mbr_first_name ." " : "";
             $fullname = $HbsMember->mbr_mid_name ? $fullname . $HbsMember->mbr_mid_name . " " : $fullname ; 
-            $fullname = $HbsMember->mbr_first_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
+            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
             $MobileUser = MobileUser::create([
                 'pocy_no' => $HbsMember->pocy_no,
                 'mbr_no' => $HbsMember->mbr_no,
@@ -90,7 +93,7 @@ class MemberController extends BaseController
 
     /**
      * Register ekyc api
-     *
+     * post
      * @return \Illuminate\Http\Response
      */
     public function ekyc(Request $request)
@@ -214,10 +217,10 @@ class MemberController extends BaseController
         
         try {
             DB::beginTransaction();
-            $password = Str::random(8);
+            $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $fullname = $HbsMember->mbr_first_name ? $HbsMember->mbr_first_name ." " : "";
             $fullname = $HbsMember->mbr_mid_name ? $fullname . $HbsMember->mbr_mid_name . " " : $fullname ; 
-            $fullname = $HbsMember->mbr_first_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
+            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
             $MobileUser = MobileUser::create([
                 'pocy_no' => $HbsMember->pocy_no,
                 'mbr_no' => $HbsMember->mbr_no,
@@ -244,7 +247,7 @@ class MemberController extends BaseController
     }
     /**
      * Login api
-     *
+     * post
      * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
@@ -279,7 +282,7 @@ class MemberController extends BaseController
 
     /**
      * forget-password
-     *
+     * post
      * @return \Illuminate\Http\Response
      */
     public function forget_password(Request $request){
@@ -298,7 +301,7 @@ class MemberController extends BaseController
         }
         try {
             DB::beginTransaction();
-            $password = Str::random(8);
+            $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $user->password = hashpass($password);
             $user->save;
             $data['contents'] = sprintf(__('frontend.create_reset_password_request_message'),$user->fullname,config('app.name'),$request->email, $password);
@@ -314,7 +317,7 @@ class MemberController extends BaseController
 
     /**
      * photo api
-     *
+     * patch
      * @return \Illuminate\Http\Response
      */
     public function photo(Request $request)
@@ -325,7 +328,8 @@ class MemberController extends BaseController
         ]);
         
         if($validator->fails()){
-            return $this->sendError(__('frontend.invalid_photo') , 400 , 400 );       
+            return $this->sendError($validator->errors()->all() , 400 , 400 );     
+            //return $this->sendError(__('frontend.invalid_photo') , 400 , 400 );       
         }
         $user = Auth::user();
         $path = config('constants.photoUpload');
@@ -345,13 +349,223 @@ class MemberController extends BaseController
 
     /**
      * info api
-     *
+     * get
      * @return \Illuminate\Http\Response
      */
     public function info(Request $request)
     {
         $user = Auth::user();
         $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->get()->toArray();
+        $years = [];
+        $years = $this->getInfo($user->mbr_no, $user->company);
+
+        $file_base64 = $user->photo ? getImageBase64(config('constants.photoUpload').$user->photo) : null;
+        $years['photo'] = $file_base64;
+        return $this->sendResponse( $years, "OK" , 0);
+    }
+
+    /**
+     * info api
+     * get
+     * @return \Illuminate\Http\Response
+     */
+    public function full_info(Request $request)
+    {
+        $user = Auth::user();
+        $HbsMember = HbsMember::where('mbr_no', '022504400')->where('company',$user->company)->get()->toArray();
+        $years = [];
+        $years = $this->getInfo($user->mbr_no, $user->company);
+        if($HbsMember[0]['children'] == null){
+            $years['children'] = null;
+        }else{
+            $children = explode(';', $HbsMember[0]['children']);
+
+            foreach ($children as $child)
+            {
+                list($mbrNo, $mbrName, $mbrAge) = explode(' - ', $child);
+                if (intval($mbrAge) < config('constants.majorityAge') && intval($mbrNo) != intval($user->mbr_no))
+                {
+                    $years['children'][] = [
+                        'mbr_no' => $mbrNo,
+                        'mbr_name' => ucwords($mbrName),
+                        'info' => $this->getInfo($mbrNo , $user->company)
+                    ];
+                }
+            }
+        };
+        return $this->sendResponse( $years, "OK" , 0);
+    }
+    
+     /**
+     * insurance-card api
+     * get
+     * @return \Illuminate\Http\Response
+     */
+    public function insurance_card(Request $request){
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->whereNotNull('ben_schedule')->orderBy('memb_eff_date', 'DESC')->first()->toArray();
+        $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
+        return $this->sendResponse( $PcvInsuredCardBuilder->get(), "OK" , 0);
+    }
+
+    /**
+     * benefit api
+     * get
+     * @return \Illuminate\Http\Response
+     */
+    public function benefit(Request $request){
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->first()->toArray();
+        $data['benefit'] = $HbsMember['benefit_' . $lang];
+        if($HbsMember['children'] == null){
+            $data['children'] = null;
+        }else{
+            $children = explode(';', $HbsMember['children']);
+
+            foreach ($children as $child)
+            {
+                list($mbrNo, $mbrName, $mbrAge) = explode(' - ', $child);
+                if (intval($mbrAge) < config('constants.majorityAge') && intval($mbrNo) != intval($user->mbr_no))
+                {
+                    $HbsMember = HbsMember::where('mbr_no',$mbrNo)->where('company',$user->company)->first()->toArray();
+                    $years['children'][] = [
+                        'mbr_no' => $mbrNo,
+                        'mbr_name' => ucwords($mbrName),
+                        'benefit' => $HbsMember['benefit_' . $lang]
+                    ];
+                }
+            }
+        };    
+        return $this->sendResponse( $data, "OK" , 0);
+    }
+    
+    /**
+     *  bank-accounts
+     *  get
+     * @return \Illuminate\Http\Response
+     */
+    public function bank_accounts(Request $request){
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $MobileUserBankAccount = MobileUserBankAccount::where('mobile_user_id',$user->id)->get();
+        return $this->sendResponse( $MobileUserBankAccount, "OK" , 0);
+    }
+
+    /**
+     *  bank-account
+     *  Post
+     * @return \Illuminate\Http\Response
+     */
+    public function bank_account_create(Request $request){
+        $validator = Validator::make($request->all(), [
+            'bank_acc_name' => 'required',
+            'bank_acc_no' => 'required',
+            'bank_name' => 'required'
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $MobileUserBankAccount = MobileUserBankAccount::where('mobile_user_id',$user->id)->count();
+        if($MobileUserBankAccount >= 1){
+            return $this->sendError(__("frontend.bank_account_exist") , 400 , 400 );    
+        }
+        $data = [
+            'bank_name' => $request->bank_name,
+            'bank_address' => $request->bank_address,
+            'bank_acc_no' => $request->	bank_acc_no,
+            'bank_acc_name' => $request->bank_acc_name,
+            'mobile_user_id' => $user->id,
+            'crt_by' => $user->fullname,
+            'upd_by' => $user->fullname,
+        ];
+        $data = MobileUserBankAccount::create($data);
+        return $this->sendResponse( $data, __("frontend.bank_account_added") , 0);
+    }
+
+    /**
+     *  bank-account
+     *  Put
+     * @return \Illuminate\Http\Response
+     */
+    public function bank_account_update(Request $request){
+        $validator = Validator::make($request->all(), [
+            'bank_acc_name' => 'required',
+            'bank_acc_no' => 'required',
+            'bank_name' => 'required'
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $MobileUserBankAccount = MobileUserBankAccount::where('mobile_user_id',$user->id)->first();
+        if($MobileUserBankAccount == null){
+            return $this->sendError(__("frontend.bank_account_not_exist") , 400 , 400 );
+        }
+        
+        $data = [
+            'bank_name' => $request->bank_name,
+            'bank_address' => $request->bank_address,
+            'bank_acc_no' => $request->	bank_acc_no,
+            'bank_acc_name' => $request->bank_acc_name,
+            'mobile_user_id' => $user->id,
+            'upd_by' => $user->fullname
+        ];
+        $MobileUserBankAccount = MobileUserBankAccount::updateOrCreate([
+            'id' => $MobileUserBankAccount->id
+        ],$data);
+        return $this->sendResponse( $MobileUserBankAccount, __("frontend.bank_account_added") , 0);
+    }
+
+    /**
+     *  device
+     *  Put
+     * @return \Illuminate\Http\Response
+     */
+    public function device(Request $request){
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'type' => 'required'
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+
+        $user = Auth::user();
+        $lang = App::currentLocale();
+        $data = [
+            'device_token' => $request->token,
+            'device_type' => $request->type,
+            'mobile_user_id' => $user->id,
+            'upd_by' => $user->fullname,
+            'crt_by' => $user->fullname
+        ];
+        $MobileDevice = MobileDevice::where('mobile_user_id',$user->id)
+        ->where('device_type',$request->type)
+        ->where('device_token',$request->token)
+        ->orderBy('updated_at','DESC')->get();
+        
+        if($MobileDevice->count() == 0){
+            MobileDevice::create($data);
+        }
+
+        if($MobileDevice->count() > 0){
+            MobileDevice::where('mobile_user_id',$user->id)
+            ->where('device_type',$request->type)
+            ->where('device_token',$request->token)->update($data);
+        }
+        
+        return $this->sendResponse( [], 'ok' , 0);
+    }
+
+    private function getInfo($mbr_no, $company){
+        $HbsMember = HbsMember::where('mbr_no',$mbr_no)->where('company',$company)->get()->toArray();
         if(empty($HbsMember)){
             return $this->sendError(__('frontend.internal_server_error'), 400,400);
         }
@@ -373,6 +587,7 @@ class MemberController extends BaseController
             {
                 $pocyYears[$key]['events_vi'][] = $row['memb_rstr_vi'];
             }
+            $pocyYears[$key]['fullname'] = $row['mbr_first_name'] .' '. $row['mbr_mid_name'] .' '. $row['mbr_last_name'];
             
         }
         krsort($pocyYears);
@@ -449,138 +664,7 @@ class MemberController extends BaseController
                 $pocyYear['can_claim'] = false;
             }
         }
-        return $this->sendResponse( $years, "OK" , 0);
-    }
-    
-     /**
-     * insurance-card api
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function insurance_card(Request $request){
-        $user = Auth::user();
-        $lang = $this->lang;
-        $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->whereNotNull('ben_schedule')->orderBy('memb_eff_date', 'DESC')->first()->toArray();
-        $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
-        return $this->sendResponse( $PcvInsuredCardBuilder->get(), "OK" , 0);
+        return $years;
     }
 
-
-    public function test1(Request $request){
-        
-        $url_file = resource_path('sql/import_pcv_member.sql');
-        $sql =  file_get_contents($url_file);
-        $url_file2 = resource_path('sql/pcv_benefit_detail.sql');
-        $sql_detail =  file_get_contents($url_file2);
-        $benefits = [];
-        $HbsMember = DB::connection('hbs_pcv')->select($sql);
-        foreach ($HbsMember as $key => $item) {
-            
-            $item = json_decode(json_encode($item), true);
-            
-            $benSchedule = [];
-            $item = $this->getExtra($item, $benefits, $sql_detail);
-            dd($item);
-            
-        }
-    }
-
-
-    private function getExtra($item, &$benefits , $sql_detail){
-        $sql2 = "BEGIN PKG_RP.sp_benefit_schedule(:mplOid, :cur); END;";
-        $conn = oci_connect(
-            config('oracle.hbs_pcv.username'),
-            config('oracle.hbs_pcv.password'),
-            config('oracle.hbs_pcv.host') . '/' . config('oracle.hbs_pcv.database')
-        );
-        $cursor = oci_new_cursor($conn);
-
-        $item['benefit_en'] = '';
-        $item['benefit_vi'] = '';
-
-
-        if (!isset($benefits[$item['mbr_no']]))
-        {
-            $benefits[$item['mbr_no']] = [];
-        }
-        $hasBenefit = false;
-        if (!isset($benefits[$item['mbr_no']][$item['memb_eff_date']]))
-        {
-            $benefits[$item['mbr_no']][$item['memb_eff_date']] = [
-                'benefit_en' => '',
-                'benefit_vi' => ''
-            ];
-        }
-        elseif ($benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_en'] !== '')
-        {
-            $item['benefit_en'] = $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_en'];
-            $item['benefit_vi'] = $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_vi'];
-            $hasBenefit = true;
-        }
-
-        if ($hasBenefit)
-        {
-            return $item;
-        }
-
-        try
-        {
-            $mplid = $item['mepl_oid'];
-            $stid = oci_parse($conn, $sql2);
-            oci_bind_by_name($stid, ":mplOid", $mplid);
-            oci_bind_by_name($stid, ":cur", $cursor, -1, OCI_B_CURSOR);
-            oci_execute($stid);
-            oci_execute($cursor);
-            $benSchedule = [];
-            while (($row = oci_fetch_array($cursor, OCI_ASSOC + OCI_RETURN_NULLS)) != false)
-            {
-                $benSchedule["tmp"] = $row;
-            }
-        }
-        catch (Exception $e)
-        {
-            return $item;
-        }
-        $item['ben_schedule'] = null;
-        if (!empty($benSchedule))
-        {
-            
-            
-            $benDetails = DB::connection('hbs_pcv')->select($sql_detail, [$benSchedule['tmp']['PLAN_OID']]);
-            $benDetails = json_decode(json_encode($benDetails), true);
-            if (!empty($benDetails))
-            {
-                $benSchedule['detail'] = $benDetails[0];
-            }
-            else
-            {
-                $benSchedule['detail']['copay'] = null;
-                $benSchedule['detail']['amtperday'] = null;
-                $benSchedule['detail']['amtpervis'] = null;
-            }
-
-            $item['ben_schedule'] = json_encode($benSchedule);
-        }
-        // $langs = ['en', 'vi'];
-        // if (!$hasBenefit && $item['ben_schedule'] !== null)
-        // {
-        //     try
-        //     {
-        //         foreach ($langs as $lang)
-        //         {
-        //             // $builder = DIContainer::resolve(PcvBenefitBuilder::class, $item, $lang);
-                    
-        //             $builder = new PcvBenefitBuilder($item, $lang);
-        //             $benefit = $builder->get();
-        //             $item['benefit_' . $lang] = $benefit === null ? null : json_encode($benefit);
-        //             $benefits[$item['mbr_no']][$item['memb_eff_date']]['benefit_' . $lang] = $item['benefit_' . $lang];
-        //         }
-        //     }
-        //     catch (Exception $e)
-        //     {
-        //         dd('lỗi');
-        //     }
-        // }
-        return $item;
-    }
 }

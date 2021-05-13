@@ -17,7 +17,7 @@ class BaseController extends Controller
 
     public function __construct()
     {
-        $this->lang = App::currentLocale();
+        
     }
     /**
      * success response method.
