@@ -4,6 +4,7 @@ namespace App\Helps;
 
 
 use chillerlan\QRCode\QRCode;
+use Carbon\Carbon;
 
 
 /**
@@ -118,8 +119,8 @@ class PcvInsuredCardBuilder
         $benSchedule['detail']['pocy_no_s'] = $pocyNoString;
         $benSchedule['detail']['mbr_no'] = $member['mbr_no'];
         $benSchedule['detail']['mbr_no_s'] = $mbrNoString;
-        $benSchedule['detail']['eff_date'] = sprintf( __('frontend.date_str') , $member['memb_eff_date']);
-        $benSchedule['detail']['exp_date'] = sprintf( __('frontend.date_str') , $member['memb_exp_date']);
+        $benSchedule['detail']['eff_date'] = Carbon::createFromFormat("Y-m-d",$member['memb_eff_date'])->format('d-F-Y');
+        $benSchedule['detail']['exp_date'] = Carbon::createFromFormat("Y-m-d",$member['memb_exp_date'])->format('d-F-Y');
         $benSchedule['detail']['dob'] = date('d/m/Y', strtotime($member['dob']));
 
         if ($member['wait_period'] === 'No')
@@ -194,7 +195,7 @@ class PcvInsuredCardBuilder
         );
         imagettftext(
             $img, $labelFontSize, 0, $labelStartX, $startY,
-            $color, $font, __('frontend.pName')
+            $color, $font, __('frontend.p_name')
         );
 
         # Policy No
@@ -337,7 +338,7 @@ class PcvInsuredCardBuilder
             );
             imagettftext(
                 $img, $labelFontSize, 0, $labelStartX + 10 * $tab, $startY,
-                $color, $font, __('frontend.p_l_medicalCheckup')
+                $color, $font, __('frontend.p_l_medical_checkup')
             );
             imagettftext($img, $fontSize, 0, $startX+11*$tab, $startY, $black, $font, $detail['checkup']);
         }

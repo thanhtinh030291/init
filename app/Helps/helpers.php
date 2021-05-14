@@ -52,6 +52,20 @@ function saveImageBase64 ($base64 , $path , $oldFile = null){
     return $fileName;
 }
 
+function getImageBase64 ($path){
+    
+    if (!File::exists(storage_path("app".$path)))
+    {
+        return null;
+    }
+
+    $uri = storage_path("app".$path); 
+    $type = pathinfo($uri, PATHINFO_EXTENSION);
+    $data = file_get_contents($uri);
+    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    return  $base64;
+}
+
 function saveFile($file ,$path ,$oldFile = null)
 {
     if($oldFile){
@@ -201,7 +215,7 @@ function loadImg($imageName = null, $dir = null) {
     if (strlen(strstr($imageName, '.')) > 0) {
         return $dir . $imageName;
     } else {
-        return '/images/noimage.png';
+        return '/img/noimage.png';
     }
 }
 

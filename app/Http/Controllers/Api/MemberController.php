@@ -7,6 +7,7 @@ use App\Models\MobileUser;
 use App\Models\HbsMember;
 use App\Models\MobileUserBankAccount;
 use App\Models\MobileDevice;
+use App\Models\PlanHbsConfig;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Validation\Rule;
@@ -199,12 +200,12 @@ class MemberController extends BaseController
                   ->orWhere('mbr_first_name','like', '%' . $value . '%');
             });
         }
-
+        $HbsMember = $HbsMember->first();
         if($HbsMember == null){
             return $this->sendError(__('frontend.invalid_effect_member'), 400 , 400 );
         }
+
         $mbr_no = $HbsMember->mbr_no;
-        
         $MobileUser = MobileUser::where('mbr_no', $mbr_no )->count();
         if ($MobileUser != 0) {
             return $this->sendError(__('frontend.account_exist'), 400 , 400 );
@@ -316,6 +317,38 @@ class MemberController extends BaseController
     }
 
     /**
+     * forget-password
+     * post
+     * @return \Illuminate\Http\Response
+     */
+    public function password(Request $request){
+        //valid parameter 
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required',
+        ]);
+        
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+        $user = Auth::user();
+        if($user->email == null){
+            return $this->sendError(__('frontend.not_register_by_email') , 400 , 400 );
+        }
+
+        if(hashpass($request->old_password) !=  $user->password){
+            return $this->sendError(__('frontend.invalid_old_pass') , 400 , 400 );
+        }
+        
+        $MobileUser = MobileUser::where('id' , $user->id)->update([
+            'password' => hashpass($request->new_password),
+        ]);
+        return $this->sendResponse( $MobileUser, __('frontend.password_updated') , 0);
+        
+    }
+
+
+    /**
      * photo api
      * patch
      * @return \Illuminate\Http\Response
@@ -405,8 +438,46 @@ class MemberController extends BaseController
         $user = Auth::user();
         $lang = App::currentLocale();
         $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->whereNotNull('ben_schedule')->orderBy('memb_eff_date', 'DESC')->first()->toArray();
+        $PlanHbsConfig = PlanHbsConfig::where('plan_id', data_get($HbsMember,'plan_id'))->where('rev_no', data_get($HbsMember,'rev_no'))
+        ->where('company', $user->company)->first();
+        $info = $this->getInfo($user->mbr_no, $user->company);
         $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
-        return $this->sendResponse( $PcvInsuredCardBuilder->get(), "OK" , 0);
+        $data['card'] = $PcvInsuredCardBuilder->get(); 
+        $data['fullname'] = data_get($info,'last.fullname');
+        $data['can_claim'] = data_get($info,'last.can_claim');
+        $data['payment_exp'] = data_get($info,'last.payment_exp');
+        $date = Carbon::createFromFormat("Y-m-d", $data['payment_exp']);
+        $data['mss']  = $date->isPast() ? __('frontend.pocy_expired', ['date' => $data['payment_exp']]): null;
+        if($HbsMember['children'] == null){
+            $data['children'] = null;
+        }else{
+            $children = explode(';', $HbsMember['children']);
+            foreach ($children as $child)
+            {
+                list($mbrNo, $mbrName, $mbrAge) = explode(' - ', $child);
+                if (intval($mbrAge) < config('constants.majorityAge') && intval($mbrNo) != intval($user->mbr_no))
+                {
+                    $HbsMember = HbsMember::where('mbr_no',$mbrNo)->where('company',$user->company)->first()->toArray();
+                    $info = $this->getInfo($user->mbr_no, $user->company);
+                    $date = Carbon::createFromFormat("Y-m-d", data_get($info,'last.payment_exp'));
+                    $PlanHbsConfig = PlanHbsConfig::where('plan_id', data_get($HbsMember,'plan_id'))->where('rev_no', data_get($HbsMember,'rev_no'))
+                    ->where('company', $user->company)->first();
+                    $PcvInsuredCardBuilder = new PcvInsuredCardBuilder($HbsMember,$lang);
+                    $data['children'][] = [
+                        'mbr_no' => $mbrNo,
+                        'mbr_name' => ucwords($mbrName),
+                        'fullname' => data_get($info,'last.fullname'),
+                        'file_id'  => $PlanHbsConfig ? $PlanHbsConfig->id : null,
+                        'mss' => $date->isPast() ? __('frontend.pocy_expired', ['date' => $data['payment_exp']]): null,
+                        'can_claim' => data_get($info,'last.can_claim'),
+                        'payment_exp' => data_get($info,'last.payment_exp'),
+                        'card' => $PcvInsuredCardBuilder->get(),
+                    ];
+                }
+            }
+        }
+        
+        return $this->sendResponse( $data, "OK" , 0);
     }
 
     /**
@@ -418,27 +489,47 @@ class MemberController extends BaseController
         $user = Auth::user();
         $lang = App::currentLocale();
         $HbsMember = HbsMember::where('mbr_no',$user->mbr_no)->where('company',$user->company)->first()->toArray();
-        $data['benefit'] = $HbsMember['benefit_' . $lang];
+        $PlanHbsConfig = PlanHbsConfig::where('plan_id', data_get($HbsMember,'plan_id'))->where('rev_no', data_get($HbsMember,'rev_no'))
+        ->where('company', $user->company)->first();
+        $info = $this->getInfo($user->mbr_no, $user->company);
+
+        $data['fullname'] = data_get($info,'last.fullname');
+        $data['can_claim'] = data_get($info,'last.can_claim');
+        $data['payment_exp'] = data_get($info,'last.payment_exp');
+        $data['benefit'] = json_decode($HbsMember['benefit_' . $lang],true);
+        $date = Carbon::createFromFormat("Y-m-d", $data['payment_exp']);
+        $data['mss']  = $date->isPast() ? __('frontend.pocy_expired', ['date' => $data['payment_exp']]): null;
+        $data['file_id'] = $PlanHbsConfig ? $PlanHbsConfig->id : null;
+        $data['ready'] = $PlanHbsConfig ? $PlanHbsConfig->is_benefit_ready : 0;
         if($HbsMember['children'] == null){
             $data['children'] = null;
         }else{
             $children = explode(';', $HbsMember['children']);
-
             foreach ($children as $child)
             {
                 list($mbrNo, $mbrName, $mbrAge) = explode(' - ', $child);
                 if (intval($mbrAge) < config('constants.majorityAge') && intval($mbrNo) != intval($user->mbr_no))
                 {
                     $HbsMember = HbsMember::where('mbr_no',$mbrNo)->where('company',$user->company)->first()->toArray();
-                    $years['children'][] = [
+                    $info = $this->getInfo($user->mbr_no, $user->company);
+                    $date = Carbon::createFromFormat("Y-m-d", data_get($info,'last.payment_exp'));
+                    $PlanHbsConfig = PlanHbsConfig::where('plan_id', data_get($HbsMember,'plan_id'))->where('rev_no', data_get($HbsMember,'rev_no'))
+                    ->where('company', $user->company)->first();
+                    $data['children'][] = [
                         'mbr_no' => $mbrNo,
                         'mbr_name' => ucwords($mbrName),
-                        'benefit' => $HbsMember['benefit_' . $lang]
+                        'fullname' => data_get($info,'last.fullname'),
+                        'file_id'  => $PlanHbsConfig ? $PlanHbsConfig->id : null,
+                        'ready' => $PlanHbsConfig ? $PlanHbsConfig->is_benefit_ready : 0,
+                        'mss' => $date->isPast() ? __('frontend.pocy_expired', ['date' => $data['payment_exp']]): null,
+                        'can_claim' => data_get($info,'last.can_claim'),
+                        'payment_exp' => data_get($info,'last.payment_exp'),
+                        'benefit' => json_decode($HbsMember['benefit_' . $lang],true)
                     ];
                 }
             }
         };    
-        return $this->sendResponse( $data, "OK" , 0);
+        return $this->sendResponse( $data, "ok", 0);
     }
     
     /**

@@ -41,7 +41,7 @@ class CoverBenefitHbs extends Command
      */
     public function handle()
     {
-        $HbsMember = HbsMember::where('company','pcv')->whereNull('benefit_en')->get();
+        $HbsMember = HbsMember::where('company','pcv')->where('email','thanhtinh030291@gmail.com')->get();
         $langs = ['en', 'vi'];
         foreach ($HbsMember as $key => $value) {
             foreach ($langs as $lang)

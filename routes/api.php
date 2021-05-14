@@ -34,11 +34,14 @@ Route::group(['prefix' => 'v1' , 'middleware' => ['localization'],], function ()
             Route::put('bank-account', 'App\Http\Controllers\Api\MemberController@bank_account_update');
             Route::get('insurance-card', 'App\Http\Controllers\Api\MemberController@insurance_card');
             Route::post('device', 'App\Http\Controllers\Api\MemberController@device');
+            Route::patch('password', 'App\Http\Controllers\Api\MemberController@password');
             
         });
         
         Route::group(['prefix' => 'claim'], function () {
             Route::get('issues', 'App\Http\Controllers\Api\ClaimController@issues');
+            Route::get('issue/{id}', 'App\Http\Controllers\Api\ClaimController@issue');
+            Route::post('issue', 'App\Http\Controllers\Api\ClaimController@issue_create');
         });
         
     });

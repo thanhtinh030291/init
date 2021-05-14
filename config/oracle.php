@@ -13,7 +13,7 @@ return [
         'prefix'         => env('DB_HBS_PCV_PREFIX', ''),
         'prefix_schema'  => env('DB_HBS_PCV_SCHEMA_PREFIX', ''),
         'edition'        => env('DB_EDITION', 'ora$base'),
-        'server_version' => env('DB_SERVER_VERSION', '11g'),
+        'server_version' => env('DB_SERVER_VERSION', '11g')
     ],
     'hbs_bsh' => [
         'driver'         => 'oracle',

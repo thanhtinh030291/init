@@ -352,4 +352,7 @@ return [
     'ekyc_not_match'=>'The eKYC does not match',
     'email_required'=>'Please enter a valid Email',
     'register_success'=>'Registered is successfully, please check your email %s',
+    'not_register_by_email' => 'You are not logged in with email',
+    'pocy_expired' => 'Our policy expired on :date',
+    'not_found' => 'No matching results',
 ];

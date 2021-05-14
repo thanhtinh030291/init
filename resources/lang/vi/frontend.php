@@ -352,5 +352,8 @@ return [
     'pocy_not_exist'=>'Số Hợp đồng không tồn tại',
     'ekyc_not_match'=>'Kết quả chưa trùng khớp',
     'email_required'=>'Vui lòng nhập Email hợp lệ ',
-    'register_success'=>'đã đăng ký thành công, vui lòng kiểm tra email %s'
+    'register_success'=>'đã đăng ký thành công, vui lòng kiểm tra email %s',
+    'not_register_by_email' => 'Bạn không đăng nhập bằng email',
+    'pocy_expired' => 'Hợp đồng của chúng tôi đã hết hạn vào :date',
+    'not_found' => 'Không có kết quả được tìm thấy',
 ];
