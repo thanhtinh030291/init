@@ -57,7 +57,7 @@ class MobileUserController extends Controller
     public function show($id)
     {
         $data = MobileUser::findOrFail($id);
-        return view('mobileUserManagement.show', compact('data'));
+        return view('mobileUserManagement.show', compact('data'));
     }
 
     /**
@@ -107,15 +107,15 @@ class MobileUserController extends Controller
         if($MobileDevice->count() == 0){
             $request->session()->flash(
                 'errorStatus', 
-                'Không tìm thấy divice token '
+                'Không tìm thấy divice token'
             );
         }
         PushNotificationJob::dispatch('sendBatchNotification', [
             [$MobileDevice[0]],
             [
-                'topicName' => 'birthday',
+                'topicName' => 'Pacific Cross VN',
                 'title' => 'Chúc mứng sinh nhật',
-                'body' => 'Chúc bạn sinh nhật vui vẻ',
+                'body' => '',
                 
             ],
         ]);

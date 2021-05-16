@@ -69,7 +69,7 @@ class MemberController extends BaseController
             $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $fullname = $HbsMember->mbr_first_name ? $HbsMember->mbr_first_name ." " : "";
             $fullname = $HbsMember->mbr_mid_name ? $fullname . $HbsMember->mbr_mid_name . " " : $fullname ; 
-            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
+            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_last_name . " " : $fullname ; 
             $MobileUser = MobileUser::create([
                 'pocy_no' => $HbsMember->pocy_no,
                 'mbr_no' => $HbsMember->mbr_no,
@@ -221,7 +221,7 @@ class MemberController extends BaseController
             $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $fullname = $HbsMember->mbr_first_name ? $HbsMember->mbr_first_name ." " : "";
             $fullname = $HbsMember->mbr_mid_name ? $fullname . $HbsMember->mbr_mid_name . " " : $fullname ; 
-            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_first_name . " " : $fullname ; 
+            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_last_name . " " : $fullname ; 
             $MobileUser = MobileUser::create([
                 'pocy_no' => $HbsMember->pocy_no,
                 'mbr_no' => $HbsMember->mbr_no,

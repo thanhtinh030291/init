@@ -146,7 +146,6 @@ class ClaimController extends BaseController
                 'note' => 1,
             ];
         }
-
         if($html != null){
             $pdfBuilder->load_html($html);
             $pdfBuilder->render();
@@ -261,7 +260,6 @@ class ClaimController extends BaseController
             'filename' => 'claim_form_'.$memberNo .'_'. time() . ".pdf",
             'contents' => $fileContents
         ];
-
         $filenames[] = [
             'url' => saveImageBase64($fileContents,$path),
             'disk' => $dirk,
@@ -290,7 +288,7 @@ class ClaimController extends BaseController
             ]);
             $claim->mobile_claim_file()->createMany($filenames);
             $files = [];
-            foreach ($docs as $doc)
+            foreach ($combinedDocs as $doc)
             {
                 $files[] = [
                     'name' => $doc['filename'],
@@ -315,6 +313,20 @@ class ClaimController extends BaseController
                 'body_part' => $bodyPart,
                 'incident_detail' => $detail,
             ];
+            
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Authorization' => config('constants.PCV_ETALK_API_TOKEN'),
+            ];
+            $client = new \GuzzleHttp\Client([
+                    'headers' => $headers
+                ]);
+            
+            $response = $client->request("POST", config('constants.PCV_ETALK_API_URL').'/mobile-claim/add' , ['form_params'=>$data_up_mantis]);
+            $res = json_decode($response->getBody(),true);
+            $claim->mantis_id = data_get($res,'id');
+            $claim->extra = json_encode($res);
+            $claim->save();
             DB::commit();
             return $this->sendResponse($claim , __('frontend.add_claim_message') , 0);
         } catch (Exception $e) {

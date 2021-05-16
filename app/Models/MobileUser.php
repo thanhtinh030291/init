@@ -58,5 +58,9 @@ class MobileUser extends Authenticatable
     // protected $appends = [
     //     'profile_photo_url',
     // ];
+    public function  mobile_device(){
+        return $this->hasMany(MobileDevice::class, 'mobile_user_id', 'id');
+    }
+    
 
 }

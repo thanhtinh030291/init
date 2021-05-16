@@ -59,6 +59,11 @@ return[
     'KEY_API_EKYC' => "61cafa5c6a6148159935b07045ecfa7b",
     'SECRET_API_EKYC' => "e22cd40b5ac5268d05a0aafd5453552e53d5a4d596858057a34b0c0cd4fdd096",
     'URL_API_EKYC' =>"https://demo.computervision.com.vn",
+
     'SEVER_KEY_FIREBASE' => 'AAAAdMZIs3I:APA91bHdAWUe3CpIBaylmF_Wjpti56WBHuLLSml82c77D4sGr9rcupGgXtpCBxueXki88vO1BUaNk8cuJT9g6qH91fFtSLzvxh5dZstdLzi-94dSSDyqA4jebAB8uuYXVAooIwf9Dt7Y',
+
+    'PCV_ETALK_URL' => 'https://pcv-etalk-test.pacificcross.com.vn/',
+    'PCV_ETALK_API_URL' => 'https://pcv-etalk-test.pacificcross.com.vn/api/rest/',
+    'PCV_ETALK_API_TOKEN' => 'TvwK32peZhN37QBvRYPW-deUt-K8YPow',
     
 ];
