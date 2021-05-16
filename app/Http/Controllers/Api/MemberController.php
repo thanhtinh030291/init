@@ -82,7 +82,7 @@ class MemberController extends BaseController
                 'address' => $HbsMember->address
             ]);
             $data['contents'] = sprintf(__('frontend.create_mobile_user_message'),$fullname,config('app.name'),$request->email, $password);
-            sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));
+            //sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));
             DB::commit();
             return $this->sendResponse($MobileUser , sprintf( __('frontend.register_success'), $request->email) , 0);
         } catch (Exception $e) {

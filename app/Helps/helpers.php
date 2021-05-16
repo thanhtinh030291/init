@@ -8,6 +8,7 @@ use App\Notifications\PushNotification;
 use Pusher\Pusher;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 
 
 function saveImage($file ,$path, $thumbnail=null){
@@ -45,7 +46,7 @@ function saveImageBase64 ($base64 , $path , $oldFile = null){
     $handle=fopen("php://temp", "rw");
     fwrite($handle, base64_decode($base64));
     fseek($handle, 0);
-    $extension = explode('/', mime_content_type($handle))[1];
+    $extension = mine_to_ext(mime_content_type($handle));
     $str = Str::random(10);
     $fileName = time() . $str . '.' . $extension;
     Storage::put($path.$fileName, base64_decode($base64));
@@ -219,14 +220,6 @@ function loadImg($imageName = null, $dir = null) {
     }
 }
 
-function loadAvantarUser($avantar){
-    if($avantar == 'admin.png'){
-        return '/images/noimage.png';
-    }else{
-        return loadImg($avantar, config('constants.avantarStorage').'thumbnail/');
-    }
-    
-}
 
 function generateLogMsg(Exception $exception) {
     $message = $exception->getMessage();
@@ -345,27 +338,7 @@ function dateConvertToString($date = null)
     return $rs_date;
 }
 
-// return start , end hours from daterangepickker
 
-function getHourStartEnd($text){
-    //24/10/2014 00:00 - 30/10/2014 23:59
-    
-    $start = trim(explode('-', $text)[0]);
-    $end = trim(explode('-', $text)[1]);
-
-    return [
-        'date_start' =>  explode(' ', $start)[0],
-        'hours_start' =>  explode(' ', $start)[1],
-        'date_end' =>  explode(' ', $end)[0],
-        'hours_end' =>  explode(' ', $end)[1],
-    ];
-}
-
-
-function datepayment(){
-    $now = Carbon\Carbon::now();
-    return "Ngày ".$now->day." Tháng ".$now->month." Năm ".$now->year;
-}
 function notifi_system($content, $arrUserID = []){
     $user = User::findOrFail(1);
     $options = array(
@@ -436,15 +409,7 @@ function getTokenCPS(){
     return  $setting->token_cps;
 }
 
-function typeGop($value){
-    $rp = "";
-    foreach (config('constants.gop_type') as $key_type => $value_type) {
-        $checked = $value == $key_type ? 'checked' : '';
-        $rp .=   "<input type='radio' {$checked}>
-                <span style='font-family: serif; font-size: 10pt;'>{$value_type}</span><br>";
-    }
-    return $rp;
-}
+
 
 function numberToRomanRepresentation($string) {
     $chars = preg_split('//', $string, -1, PREG_SPLIT_NO_EMPTY);
@@ -561,3 +526,67 @@ function vn_to_str ($str){
     
 }
 
+function mine_to_ext($str){
+    $mime_types = array(
+
+        'txt' => 'text/plain',
+        'htm' => 'text/html',
+        'html' => 'text/html',
+        'php' => 'text/html',
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'json' => 'application/json',
+        'xml' => 'application/xml',
+        'swf' => 'application/x-shockwave-flash',
+        'flv' => 'video/x-flv',
+
+        // images
+        'png' => 'image/png',
+        'jpe' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'jpg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'bmp' => 'image/bmp',
+        'ico' => 'image/vnd.microsoft.icon',
+        'tiff' => 'image/tiff',
+        'tif' => 'image/tiff',
+        'svg' => 'image/svg+xml',
+        'svgz' => 'image/svg+xml',
+
+        // archives
+        'zip' => 'application/zip',
+        'rar' => 'application/x-rar-compressed',
+        'exe' => 'application/x-msdownload',
+        'msi' => 'application/x-msdownload',
+        'cab' => 'application/vnd.ms-cab-compressed',
+
+        // audio/video
+        'mp3' => 'audio/mpeg',
+        'qt' => 'video/quicktime',
+        'mov' => 'video/quicktime',
+
+        // adobe
+        'pdf' => 'application/pdf',
+        'psd' => 'image/vnd.adobe.photoshop',
+        'ai' => 'application/postscript',
+        'eps' => 'application/postscript',
+        'ps' => 'application/postscript',
+
+        // ms office
+        'doc' => 'application/msword',
+        'rtf' => 'application/rtf',
+        'xls' => 'application/vnd.ms-excel',
+        'ppt' => 'application/vnd.ms-powerpoint',
+
+        // open office
+        'odt' => 'application/vnd.oasis.opendocument.text',
+        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+    );
+    $result=array_flip($mime_types);
+    return data_get($result,$str,'md');
+}
+
+function get_path_upload(){
+    $dirk = Carbon::now()->format('m_Y');
+    return config('constants.srcUpload').$dirk."/";
+}

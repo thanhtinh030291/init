@@ -20,7 +20,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                {{ Form::open(array('url' => '/admin/user/'.$data->id, 'method'=>'post', 'id' => 'frmUpdateStaff', 'files' => true))}} @method('PUT')
+                {{-- {{ Form::open(array('url' => '/admin/user/'.$data->id, 'method'=>'post', 'id' => 'frmUpdateStaff', 'files' => true))}} @method('PUT') --}}
                     <!-- Staff info -->
                 <div class="row">
                     <div class="col-md-6 p-2">
@@ -46,12 +46,28 @@
                         {{ Form::label('id_card',__('message.id_card'), array('class' => 'labelas')) }}
                         {{ Form::text('id_card', $data->id_card, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
+                        
+
+                        
+                    </div>
+                    <div class="col-md-6 p-2">
                         {{ Form::label('front_card_url',__('message.front_card_url'), array('class' => 'labelas')) }}<br>
                         <img src="{{loadImg($data->front_card_url, asset(config('constants.srcStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
-
+                    </div>
+                    <div class="col-md-6 p-2">
                         {{ Form::label('back_card_url',__('message.back_card_url'), array('class' => 'labelas')) }}<br>
                         <img src="{{loadImg($data->back_card_url, asset(config('constants.srcStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
+                    </div>
 
+                    <div class="card col-md-12 p-2">
+                        {{ Form::open(array('url' => '/admin/notification/'.$data->id, 'method'=>'post', 'id' => 'frmUpdateStaff', 'files' => true))}}
+                            <h5 class="card-header">Notication</h5>
+                            <div class="card-body">
+                                <h5 class="card-title">Contents</h5>
+                                <textarea name="contents" class="card-text form-control"></textarea>
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        {{ Form::close() }}
                     </div>
                 </div>
 
@@ -59,10 +75,10 @@
                     <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-6">
                             <a class="btn btn-secondary" href="{{url('admin/mobileuser')}}"> {{ __('message.back')}} </a>
-                            {{ Form::submit( __('message.save'),['class' => 'btn btn-primary center-block']) }}<br>
+                            {{-- {{ Form::submit( __('message.save'),['class' => 'btn btn-primary center-block']) }}<br> --}}
                         </div>
                     </div>
-                {{ Form::close() }}
+                {{-- {{ Form::close() }} --}}
             </div>
         </div>
     </div>

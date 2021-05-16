@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\Notification\NotificationService;
+use App\Services\Notification\FcmService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,7 +32,7 @@ class PushNotificationJob implements ShouldQueue
     /**
      * @param NotificationService $notificationService
      */
-    public function handle(NotificationService $notificationService)
+    public function handle(FcmService $notificationService)
     {
         call_user_func_array(
             [

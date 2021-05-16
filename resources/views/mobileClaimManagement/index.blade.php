@@ -3,10 +3,10 @@
 <div class="row">
     <div class="col-xl-12">
         <div class="breadcrumb-holder">
-            <h1 class="main-title float-left">{{ __('message.user_mobile')}}</h1>
+            <h1 class="main-title float-left">{{ __('message.claim_mobile')}}</h1>
             <ol class="breadcrumb float-right">
                 <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active">{{ __('message.user_mobile')}}</li>
+                <li class="breadcrumb-item active">{{ __('message.claim_mobile')}}</li>
             </ol>
             <div class="clearfix"></div>
         </div>
@@ -25,10 +25,10 @@
                 <form action="{{ url('admin/admins')}}" method="GET" class="form-horizontal">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ Form::label('email', __('message.email'), array('class' => 'labelas')) }}
+                        {{-- {{ Form::label('email', __('message.email'), array('class' => 'labelas')) }}
                         {{ Form::text('email',$search['email'], ['class' => 'form-control']) }} <br/>
                         {{ Form::label('name', __('message.name'), array('class' => 'labelas')) }}
-                        {{ Form::text('name', $search['name'], ['class' => 'form-control']) }} <br/>
+                        {{ Form::text('name', $search['name'], ['class' => 'form-control']) }} <br/> --}}
                     </div>
                 </div>
                 <button type="submit" class="btn btn-info"> {{ __('message.search')}} </button>
@@ -54,12 +54,13 @@
                         <!-- Table Headings -->
                         <thead>
                             <tr>
-                                
-                                <th>{{ __('message.email')}}</th>
+                                <th>{{ __('message.status')}}</th>
                                 <th>{{ __('message.fullname')}}</th>
                                 <th>{{ __('message.mbr_no')}}</th>
                                 <th>{{ __('message.pocy_no')}}</th>
                                 <th>{{ __('message.company')}}</th>
+                                <th>{{ __('message.updated_at')}}</th>
+                                <th>{{ __('message.created_at')}}</th>
                                 <th class='text-center'>{{ __('message.control')}}</th>
                             </tr>
                         </thead>
@@ -68,19 +69,16 @@
                         <tbody>
                             <tr>
                                 <!-- staff info -->
-                                
-                                <td>{{$data->email}}</td>
-                                <td>{{$data->fullname}}</td>
-                                <td>{{$data->mbr_no}}</td>
-                                <td>{{$data->pocy_no}}</td>
-                                <td>{{$data->company}}</td>
+                                <th>{{$data->mobile_claim_status->name}}</th>
+                                <td>{{$data->mobile_user->fullname}}</td>
+                                <td>{{$data->mobile_user->mbr_no}}</td>
+                                <td>{{$data->mobile_user->pocy_no}}</td>
+                                <td>{{$data->mobile_user->company}}</td>
+                                <td>{{$data->updated_at}}</td>
                                 <td>{{$data->created_at}}</td>
                                 <td class='text-center'>
                                     <!-- control -->
-                                    <a class="btn btn-success" href='{{url("admin/mobileuser/$data->id")}}'>{{__('message.view')}}</a>
-                                    {{ Form::open(array('url' => '/admin/mobileuser/'.$data->id, 'method' => 'DELETE' ,'class'=>'action_form','class' =>'needs-validation')) }}
-                                        {!! Form::button('Delete',['class' => 'btn btn-danger btn-needs-validation btn-delete']) !!}
-                                    {{ Form::close() }}
+                                    <a class="btn btn-success" href='{{url("admin/mobileclaim/$data->id")}}'>{{__('message.view')}}</a>
                                 </td>
                             </tr>
                         </tbody>

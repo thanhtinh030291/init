@@ -40,6 +40,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         //moblie user
         Route::resource('mobileuser', 'App\Http\Controllers\MobileUserController');
+        Route::post('notification/{id}', 'App\Http\Controllers\MobileUserController@notification');
+
+        //moblie Claim
+        Route::resource('mobileclaim', 'App\Http\Controllers\MobileClaimController');
     });
 });
 

@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\MobileUser;
-use App\Models\MobileDevice;
+use App\Models\MobileClaim;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use App\Jobs\PushNotificationJob;
-class MobileUserController extends Controller
+use Illuminate\Support\Facades\Storage;
+
+class MobileClaimController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,9 +22,9 @@ class MobileUserController extends Controller
             'name' => $request->get('name'),
             'email' => $request->get('email'),
         ];
-        $datas = MobileUser::latest()->paginate();
+        $datas = MobileClaim::latest()->paginate();
         
-        return view('mobileUserManagement.index', compact('datas','search'));
+        return view('mobileClaimManagement.index', compact('datas','search'));
     }
 
     /**
@@ -56,8 +56,38 @@ class MobileUserController extends Controller
      */
     public function show($id)
     {
-        $data = MobileUser::findOrFail($id);
-        return view('mobileUserManagement.show', compact('data'));
+        $data = MobileClaim::findOrFail($id);
+        $files = $data->mobile_claim_file;
+        $initialPreview = [];
+        $initialPreviewConfig = [];
+        foreach ($files as $key => $value) {
+            $initialPreview[] = asset(config('constants.srcStorage').$value->disk ."/".$value->url);
+            $path = storage_path('app'.config('constants.srcUpload').$value->disk ."/".$value->url);
+            $info =  pathinfo($path);
+            $filesize = filesize($path); // bytes
+            $filesize = round($filesize / 1024 , 1);
+            $arr_map_type = [
+                'pdf' => 'pdf',
+                'tiff' => 'gdocs',
+                'doc' => 'office',
+                'docx' => 'office',
+                'xls' => 'office',
+                'ppt' => 'office',
+                'text' => 'text',
+                'html' => 'html',
+                'mp4' => 'video'
+            ];
+            $initialPreviewConfig[] = [
+                'type' => data_get($arr_map_type , $info['extension'] ,'image'),
+                'size' => $filesize,
+                'caption' => $info['basename'],
+                'url' => '/file-upload-batch/2',
+                'key' => $key+1
+            ];
+        }
+
+        
+        return view('mobileClaimManagement.show', compact('data', 'initialPreview', 'initialPreviewConfig'));
     }
 
     /**
@@ -68,8 +98,8 @@ class MobileUserController extends Controller
      */
     public function edit($id)
     {
-        $data = MobileUser::findOrFail($id);
-        return view('mobileUserManagement.show', compact('data'));
+        $data = MobileClaim::findOrFail($id);
+        return view('mobileClaimManagement.edit', compact('data'));
     }
 
     /**
@@ -92,33 +122,11 @@ class MobileUserController extends Controller
      */
     public function destroy($id)
     {
-        if( MobileUser::findOrFail($id)->delete() ) {
+        if( MobileClaim::findOrFail($id)->delete() ) {
             flash()->success('User has been deleted');
         } else {
             flash()->success('User not deleted');
         }
-        return redirect()->back();
-    }
-
-    public function notification(Request $request,$id)
-    {
-        $MobileDevice = MobileDevice::where('mobile_user_id',$id)->pluck('device_token');
-        
-        if($MobileDevice->count() == 0){
-            $request->session()->flash(
-                'errorStatus', 
-                'Không tìm thấy divice token '
-            );
-        }
-        PushNotificationJob::dispatch('sendBatchNotification', [
-            [$MobileDevice[0]],
-            [
-                'topicName' => 'birthday',
-                'title' => 'Chúc mứng sinh nhật',
-                'body' => 'Chúc bạn sinh nhật vui vẻ',
-                
-            ],
-        ]);
         return redirect()->back();
     }
 }

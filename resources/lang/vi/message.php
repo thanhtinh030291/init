@@ -66,8 +66,8 @@ return [
     'claim_edit' => 'Claim Edit',
     'page_select' => 'Page Select',
     'id_claim' => 'ID Claim',
-    'date_created' => 'Created At',
-    'date_updated' => 'Updated At',
+    'created_at' => 'Created At',
+    'updated_at' => 'Updated At',
     'please_select' => '----------------------------------Please Select----------------------------------',
     'code_claim' => 'Code Claim',
     'letter' => 'Letter',
@@ -158,4 +158,17 @@ return [
     'detail_letter_template' => 'Detail Letter Template',
     'edit_letter_template' => 'Edit Letter Template',
     'template' => 'Template',
+
+    //moblie Claim
+    'claim_mobile' => 'Mobile Claim',
+    'fullname' => 'Fullname',
+    'mbr_no' => 'Member No',
+    'pocy_no' => 'Policy No',
+    'company' => 'Company',
+    'mantis_id' => 'Mantis Id',
+    'tel' => 'Phone',
+    'id_card' => 'Id Card',
+    'front_card_url' => 'Front Of Card',
+    'back_card_url' => 'Back Of Card',
+    'file' => 'Attachment'
 ];

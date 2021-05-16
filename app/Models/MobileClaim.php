@@ -29,8 +29,15 @@ class MobileClaim extends BaseModel
     /**
      * Get the phone associated with the user.
      */
-    // public function mobile_status()
-    // {
-        // return $this->hasOne(MobileClaimStatus::class, 'id' ,'mobile_claim_status_id');
-    // }
+    public function mobile_claim_status()
+    {
+        return $this->hasOne(MobileClaimStatus::class, 'id' ,'mobile_claim_status_id');
+    }
+    public function mobile_claim_file(){
+        return $this->hasMany(MobileClaimFile::class,'mobile_claim_id');
+    }
+    public function mobile_user()
+    {
+        return $this->belongsTo(MobileUser::class, 'mobile_user_id', 'id');
+    }
 }
