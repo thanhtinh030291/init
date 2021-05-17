@@ -13,7 +13,7 @@
             <div class="info-box-content">
             <span class="info-box-text">CPU Traffic</span>
             <span class="info-box-number">
-                10
+                {{ data_get($load,0,"...") }}
                 <small>%</small>
             </span>
             </div>
@@ -28,7 +28,7 @@
 
             <div class="info-box-content">
             <span class="info-box-text">Claim</span>
-            <span class="info-box-number">41,410</span>
+            <span class="info-box-number">{{$count_claim}}</span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -45,7 +45,7 @@
 
             <div class="info-box-content">
             <span class="info-box-text">Staff</span>
-            <span class="info-box-number">760</span>
+            <span class="info-box-number">...</span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -58,7 +58,7 @@
 
             <div class="info-box-content">
             <span class="info-box-text">Members</span>
-            <span class="info-box-number">2,000</span>
+            <span class="info-box-number">{{$count_user_mobile}}</span>
             </div>
             <!-- /.info-box-content -->
         </div>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens ;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class MobileUser extends Authenticatable
@@ -16,6 +17,7 @@ class MobileUser extends Authenticatable
     use Notifiable;
     use \App\Http\Traits\UsesUuid;
     use HasApiTokens;
+    use SoftDeletes;
     //use HasApiTokens2;
     /**
      * The attributes that are mass assignable.
@@ -34,6 +36,24 @@ class MobileUser extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+    /**
+     * Overwrite method delete of query builder
+     * 
+     * @return $query
+     */
+    protected function runSoftDelete()
+    {
+        $query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
+
+        $is_deleted = 1;
+        $query->update(
+            [
+                $this->getDeletedAtColumn() => date("Y-m-d H:i:s"),
+                'is_deleted'                => $is_deleted
+            ]
+        );
+    }
 
     public function validateForPassportPasswordGrant($password)
     {

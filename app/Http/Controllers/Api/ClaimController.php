@@ -345,4 +345,119 @@ class ClaimController extends BaseController
         }
     }
 
+    /**
+     * Post a Note of a mobile user
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function note_create(Request $request,$id){
+        $validator = Validator::make($request->all(), [
+            'docs' => 'required',
+            'mbr_no' => 'required',
+            'note' => 'required'
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+        $claim = MobileClaim::where('id',$id)->first();
+        if($claim == null){
+            return $this->sendError(__("frontend.invalid_claim_id") , 400 , 400 );   
+        }
+        
+        $combinedDocs = [];
+        $dirk = Carbon::now()->format('m_Y');
+        $path = get_path_upload();
+        $filenames = [];
+        $html = null;
+        foreach ($docs as $id => $doc)
+        {
+            if ($doc['filetype'] === 'application/pdf')
+            {
+                $combinedDocs[]=$docs[$id];
+            }
+            else
+            {
+                $img = '
+                    <img
+                        style="max-width:100%;"
+                        src="data:' . $doc['filetype'] . ';base64,' . $doc['contents'] . '"
+                    />
+                ';
+                $html .= $img;
+            }
+            $filenames[] = [
+                'url' => saveImageBase64($doc['contents'],$path),
+                'disk' => $dirk,
+                'note' => 1,
+            ];
+        }
+        if($html != null){
+            $pdfBuilder->load_html($html);
+            $pdfBuilder->render();
+            $pdf = $pdfBuilder->output();
+            $fileContents = base64_encode($pdf);
+            $filesize = strlen($fileContents);
+            $combinedDocs[] = [
+                'filetype' => 'application/pdf',
+                'filesize' => $filesize,
+                'filename' => 'user_upload_' . time() . ".pdf",
+                'contents' => $fileContents
+            ];
+        }
+        $note = $request->note ? $request->note : " none ";
+
+        try {
+            DB::beginTransaction();
+            $claim->mobile_claim_file()->createMany($filenames);
+            $files = [];
+            $filename = [];
+            foreach ($combinedDocs as $doc)
+            {
+                $files[] = [
+                    'name' => $doc['filename'],
+                    'content' => $doc['contents']
+                ];
+                $filename[]=$doc['filename'];
+            }
+            $status = MobileClaimStatus::where('code',17)->first();
+            $issue = json_decode($claim->extra, true);
+            $issue['status'] = [
+                'id' => $status->id,
+                'name' => $status->name,
+                'name_en' => $status->name,
+                'name_vi' => $status->name_vi
+            ];
+            $issue['notes'][] = [
+                'text' => $note,
+                'date_submitted' => date('Y-m-d H:i:s'),
+                'status' => $status,
+                'filename' => implode('; ', $filename)
+            ];
+
+            $claim->mobile_claim_status_id = $status->id;
+            $claim->extra = json_encode($issue);
+            $data_up_mantis = [
+                'note' => $note,
+                'files' => $files,
+            ];
+            
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Authorization' => config('constants.PCV_ETALK_API_TOKEN'),
+            ];
+            $client = new \GuzzleHttp\Client([
+                    'headers' => $headers
+                ]);
+            
+            $response = $client->request("POST", config('constants.PCV_ETALK_API_URL').'/mobile-claim/add-note/'.{$claim->mantis_id}, ['form_params'=>$data_up_mantis]);
+            $res = json_decode($response->getBody(),true);
+            $claim->save();
+            DB::commit();
+            return $this->sendResponse($claim , __('frontend.note_added') , 0);
+        } catch (Exception $e) {
+            Log::error(generateLogMsg($e));
+            DB::rollback();
+            return $this->sendError(__('frontend.internal_server_error'), 500 );
+        }
+    }
 }

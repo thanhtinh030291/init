@@ -442,7 +442,7 @@ function push_notify_fcm($title , $contents , $mobile_user_id){
             'topicName' => 'Pacificcrossvn',
             'title' => $title,
             'body' => $contents,
-            
+            'image' => asset('img/logo.png'),
         ],
     ) ;
     \App\Models\Message::create([

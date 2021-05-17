@@ -42,6 +42,7 @@ Route::group(['prefix' => 'v1' , 'middleware' => ['localization'],], function ()
             Route::get('issues', 'App\Http\Controllers\Api\ClaimController@issues');
             Route::get('issue/{id}', 'App\Http\Controllers\Api\ClaimController@issue');
             Route::post('issue', 'App\Http\Controllers\Api\ClaimController@issue_create');
+            Route::post('note/{id}', 'App\Http\Controllers\Api\ClaimController@note_create');
         });
         
     });

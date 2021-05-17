@@ -8,13 +8,14 @@ importScripts('https://www.gstatic.com/firebasejs/8.6.1/firebase-messaging.js');
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
 firebase.initializeApp({
-    apiKey: "AIzaSyBTHTKBDMg9feCwbB5Mp9ceiR-kR3QFL3M",
-    authDomain: "pacific-cross.firebaseapp.com",
-    projectId: "pacific-cross",
-    storageBucket: "pacific-cross.appspot.com",
-    messagingSenderId: "501542859634",
-    appId: "1:501542859634:web:0274ffd7f050783f55a3eb",
-    measurementId: "G-W2HN0MDWL3"
+  apiKey: "AIzaSyBeCuw8AhSfHsTz-Ghod_uCbVbLJdc2DUA",
+  authDomain: "mobile-claim.firebaseapp.com",
+  //databaseURL: "https://mobile-claim.firebaseio.com",
+  projectId: "mobile-claim",
+  storageBucket: "mobile-claim.appspot.com",
+  messagingSenderId: "609585268745",
+  appId: "1:609585268745:web:90acc402c1308f152d10d8",
+  measurementId: "G-SKC1J86E1W"
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background

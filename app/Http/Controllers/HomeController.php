@@ -24,6 +24,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $load = sys_getloadavg();
+        $count_claim = \App\Models\MobileClaim::count();
+        $count_user_mobile = \App\Models\MobileUser::count();
+        
+	    //dd ($load[0]);
+        return view('home',compact('load','count_claim','count_user_mobile'));
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Carbon\Carbon;
 use App\Models\MobileUser;
+use App\Models\Provider;
 use DB;
 
 
@@ -115,7 +116,7 @@ class SettingController extends Controller
         $data = DB::connection('website')->select(DB::raw("
             SELECT * FROM (
                 SELECT
-                    id,
+                    id AS `code`,
                     title AS `name`,
                     MAX(IF(name = 'providerPhone', value, NULL)) AS `phone`,
                     MAX(IF(name = 'providerEmail', value, NULL)) AS `email`,
@@ -160,6 +161,36 @@ class SettingController extends Controller
                 GROUP BY id, title
             ) A
         "));
-        dd($data);         
+        foreach ($data as $row) {
+            Provider::updateOrCreate([
+                'code'   => $row->code,
+            ],[
+                'phone'          => $row->phone,
+                'email'          => $row->email,
+                'website'        => $row->website,
+                'address'        => $row->address,
+                'city'           => $row->city,
+                'district'       => $row->district,
+                'country'        => $row->country,
+                'latitude'       => $row->latitude,
+                'longitude'      => $row->longitude,
+                'day_from_1'     => $row->day_from_1,
+                'day_to_1'       => $row->day_to_1,
+                'day_from_2'     => $row->day_from_2,
+                'day_to_2'       => $row->day_to_2,
+                'hour_open_1'    => $row->hour_open_1,
+                'hour_close_1'   => $row->hour_close_1,
+                'hour_open_2'    => $row->hour_open_2,
+                'hour_close_2'   => $row->hour_close_2,
+                'emergency_services'        => $row->emergency_services,
+                'emergency_phone'           => $row->emergency_phone,
+                'direct_billing'            => $row->direct_billing,
+                'amount'                    => $row->amount,
+                'medical_type'              => $row->medical_type,
+                'medical_services'          => $row->medical_services,
+                'price_from'                => $row->price_from,
+                'price_to'                  => $row->price_to,
+            ]);
+        }
     }
 }
