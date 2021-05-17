@@ -1,6 +1,6 @@
 <!-- Stored in resources/views/layouts/admin/partials/top_bar_navigation.blade.php -->
 @extends('layouts.admin.master')
-@section('title', 'PanciFic-Cross-Admin')
+@section('title', 'Pacific-Cross-Admin')
 @section('content')
 <section class="content">
     <div class="container-fluid">

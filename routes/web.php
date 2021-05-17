@@ -34,6 +34,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('setting',  'App\Http\Controllers\SettingController@index')->name('setting.index');
         Route::post('setting/update','App\Http\Controllers\SettingController@update');
         Route::post('setting/updatePlan','App\Http\Controllers\SettingController@updatePlan');
+        Route::post('setting/updateProvider','App\Http\Controllers\SettingController@updateProvider');
 
         //plan hbs
         Route::resource('hbsplan', 'App\Http\Controllers\HbsPlanConfigController');

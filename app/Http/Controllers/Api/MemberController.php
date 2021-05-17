@@ -80,7 +80,7 @@ class MemberController extends BaseController
                 'is_policy_holder' => $HbsMember->is_policy_holder,
                 'language' => "_vi",
                 'address' => $HbsMember->address,
-                'resrouce' => "HBS",
+                'resoure' => "HBS",
             ]);
             $data['contents'] = sprintf(__('frontend.create_mobile_user_message'),$fullname,config('app.name'),$request->email, $password);
             //sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));
@@ -159,6 +159,7 @@ class MemberController extends BaseController
                     $mbr_name = strtoupper(vn_to_str($response_ocr->data[1]->info->name));
                     $dob = $response_ocr->data[1]->info->dob;
                     $id_card = $response_ocr->data[1]->info->id;
+                    
                 }else{
                     return $this->sendError(__("frontend.id_font_requid") , 400 , 400 );
                 }
@@ -238,14 +239,14 @@ class MemberController extends BaseController
                 'tel' => $HbsMember->tel,
                 'email' => $request->email,
                 'is_policy_holder' => $HbsMember->is_policy_holder,
-                'language' => "_vi",
+                'language' => "vi",
                 'address' => $HbsMember->address,
                 'fb_id' => $fb_id,
                 'gg_id' => $gg_id,
-                'card_id' => $id_card,
+                'id_card' => $id_card,
                 'front_card_url' => $photo_front,
                 'back_card_url' => $photo_back,
-                'resrouce' => "EKYC",
+                'resoure' => "EKYC",
             ]);
             $data['contents'] = sprintf(__('frontend.create_mobile_user_message'),$fullname,config('app.name'),$request->email, $password);
             sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));

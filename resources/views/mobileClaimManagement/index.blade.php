@@ -55,10 +55,11 @@
                         <thead>
                             <tr>
                                 <th>{{ __('message.status')}}</th>
+                                <th>{{ __('message.mantis')}}</th>
                                 <th>{{ __('message.fullname')}}</th>
-                                <th>{{ __('message.mbr_no')}}</th>
-                                <th>{{ __('message.pocy_no')}}</th>
-                                <th>{{ __('message.company')}}</th>
+                                <th>{{ __('message.pay_type')}}</th>
+                                <th>{{ __('message.pres_amt')}}</th>
+                                <th>{{ __('message.reason')}}</th>
                                 <th>{{ __('message.updated_at')}}</th>
                                 <th>{{ __('message.created_at')}}</th>
                                 <th class='text-center'>{{ __('message.control')}}</th>
@@ -70,10 +71,11 @@
                             <tr>
                                 <!-- staff info -->
                                 <th>{{$data->mobile_claim_status->name}}</th>
-                                <td>{{$data->mobile_user->fullname}}</td>
-                                <td>{{$data->mobile_user->mbr_no}}</td>
-                                <td>{{$data->mobile_user->pocy_no}}</td>
-                                <td>{{$data->mobile_user->company}}</td>
+                                <td>{{$data->mantis_id}}</td>
+                                <td>{{$data->fullname}}</td>
+                                <td>{{$data->pay_type}}</td>
+                                <td>{{$data->pres_amt}}</td>
+                                <td>{{$data->reason}}</td>
                                 <td>{{$data->updated_at}}</td>
                                 <td>{{$data->created_at}}</td>
                                 <td class='text-center'>

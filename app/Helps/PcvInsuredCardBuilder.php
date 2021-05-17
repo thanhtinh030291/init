@@ -21,7 +21,7 @@ class PcvInsuredCardBuilder
     const MASTER_DENTAL_LS2 = 10000000;
 
     private $data;
-
+    private $lang_date;
     /**
      * @throws
      */
@@ -30,6 +30,7 @@ class PcvInsuredCardBuilder
         $cardDetail = $this->getCardBenefit($member, $lang);
         $this->data = $cardDetail !== false
                 ? $this->getInsuranceCard($cardDetail['detail']) : null;
+        $this->lang_date = $lang;
     }
 
     /**
@@ -119,8 +120,8 @@ class PcvInsuredCardBuilder
         $benSchedule['detail']['pocy_no_s'] = $pocyNoString;
         $benSchedule['detail']['mbr_no'] = $member['mbr_no'];
         $benSchedule['detail']['mbr_no_s'] = $mbrNoString;
-        $benSchedule['detail']['eff_date'] = Carbon::createFromFormat("Y-m-d",$member['memb_eff_date'])->format('d-F-Y');
-        $benSchedule['detail']['exp_date'] = Carbon::createFromFormat("Y-m-d",$member['memb_exp_date'])->format('d-F-Y');
+        $benSchedule['detail']['eff_date'] = $this->lang_date == 'en' ? ( Carbon::createFromFormat("Y-m-d",$member['memb_eff_date'])->format('d-F-Y') ) : ( Carbon::createFromFormat("Y-m-d",$member['memb_eff_date'])->format('d-m-Y') ) ;
+        $benSchedule['detail']['exp_date'] = $this->lang_date == 'en' ? ( Carbon::createFromFormat("Y-m-d",$member['memb_exp_date'])->format('d-F-Y') ) : ( Carbon::createFromFormat("Y-m-d",$member['memb_exp_date'])->format('d-m-Y') ) ;
         $benSchedule['detail']['dob'] = date('d/m/Y', strtotime($member['dob']));
 
         if ($member['wait_period'] === 'No')

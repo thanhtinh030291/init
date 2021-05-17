@@ -65,7 +65,7 @@ class HbsPlanConfigController extends Controller
         $data['updated_user'] = $userId;
 
         PlanHbsConfig::create($data);
-        $request->session()->flash('status', __('message.reason_inject_create_success')); 
+        $request->session()->flash('status', __('message.update_success')); 
         
         return redirect('/admin/PlanHbsConfig');
     }
@@ -93,17 +93,7 @@ class HbsPlanConfigController extends Controller
     public function edit($id)
     {
         $data = PlanHbsConfig::findOrFail($id);
-        $dirStorage = config('constants.srcStorage');
-        $dataImage = [];
-        $previewConfig = [];
-        if($data->url){
-            $dataImage[] = "<img class='kv-preview-data file-preview-image' src='" . asset(config('constants.srcStorage').'/'.$data->url) . "'>";
-            $previewConfig[]['caption'] = $data->url;
-            $previewConfig[]['width'] = "120px";
-            $previewConfig[]['url'] = "/admin/hbsplan/removeImage";
-            $previewConfig[]['key'] = $data->url;
-        }
-        return view('PlanHbsManagement.edit', compact('data','dataImage', 'previewConfig'));
+        return view('PlanHbsManagement.edit', compact('data'));
     }
 
     /**
@@ -118,11 +108,17 @@ class HbsPlanConfigController extends Controller
         $data = $request->except([]);
         $dataOld = PlanHbsConfig::findOrFail($id);
         
-        if ($request->_url_file) {
-            $data['url'] = saveFile($request->_url_file[0], config('constants.srcUpload'),$dataOld->url);
+        if ($request->filename_vi) {
+            $data['filename_vi'] = saveFile($request->filename_vi[0], config('constants.srcUpload'),$dataOld->filename_vi);
         }
+        
+        if ($request->filename_en) {
+            $data['filename_en'] = saveFile($request->filename_en[0], config('constants.srcUpload'),$dataOld->filename_en);
+        }
+        
         PlanHbsConfig::updateOrCreate(['id' => $id], $data);
-        $request->session()->flash('status', __('message.reason_inject_update_success')); 
+        
+        $request->session()->flash('status', __('message.update_success')); 
         return redirect('/admin/hbsplan');
     }
 
@@ -136,6 +132,6 @@ class HbsPlanConfigController extends Controller
     {
         $data = $PlanHbsConfig;
         $data->delete();
-        return redirect('/admin/PlanHbsConfig')->with('status', __('message.reason_inject_delete_success'));
+        return redirect('/admin/PlanHbsConfig')->with('status', __('message.update_fail'));
     }
 }

@@ -46,7 +46,7 @@
                         {{ Form::text('tel', $data->tel, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
                         {{ Form::label('id_card',__('message.id_card'), array('class' => 'labelas')) }}
-                        {{ Form::text('id_card', $data->card_id, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+                        {{ Form::text('id_card', $data->id_card, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
                         {{ Form::label('first_login',__('message.first_login'), array('class' => 'labelas')) }}
                         {{ Form::text('first_login', $data->first_login, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
@@ -55,7 +55,7 @@
                         {{ Form::text('last_login', $data->last_login, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
                         {{ Form::label('id_card',__('message.resrouce'), array('class' => 'labelas')) }}
-                        {{ Form::text('resrouce', $data->resrouce, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+                        {{ Form::text('resoure', $data->resoure, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
 
 
@@ -64,11 +64,11 @@
                 <div class="row">
                     <div class="col-md-6 p-2">
                         {{ Form::label('front_card_url',__('message.front_card_url'), array('class' => 'labelas')) }}<br>
-                        <img src="{{loadImg($data->front_card_url, asset(config('constants.srcStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
+                        <img src="{{loadImg($data->front_card_url, asset(config('constants.photoStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
                     </div>
                     <div class="col-md-6 p-2">
                         {{ Form::label('back_card_url',__('message.back_card_url'), array('class' => 'labelas')) }}<br>
-                        <img src="{{loadImg($data->back_card_url, asset(config('constants.srcStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
+                        <img src="{{loadImg($data->back_card_url, asset(config('constants.photoStorage')))}}" alt="img" class="img-thumbnail" width="350" height="236"/><br>
                     </div>
                 </div>
                 <div class="row">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Models\MobileClaim;
+use App\Models\MobileUser;
 use App\Models\MobileClaimStatus;
 use App\Models\MobileUserBankAccount;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +58,7 @@ class ClaimController extends BaseController
         $hoursDiff = $dteDiff->h + $dteDiff->days*24;
         $claim['ranger_time'] = $hoursDiff;
         $claim['accept_add_sub'] = $hoursDiff <= 48 ? true : false; 
+        $claim['extra'] = json_decode($claim['extra'],true);
         return $this->sendResponse($claim, 'OK', 0); 
     }
 
@@ -68,18 +70,23 @@ class ClaimController extends BaseController
     public function issue_create(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'mbr_no' => 'required',
             'payment_type' => 'required',
+            'reason' => 'required',
             'pres_amt' => 'required',
-            'symtom_time' => 'required|date',
-            'occur_time' => 'required|date',
             'docs' => 'required',
+            'symtom_time' => 'required_if:reason,illness',
+            'occur_time' => 'required_if:reason,accident',
+            'incident_detail' => 'required_if:reason,accident',
+            'body_part' => 'required_if:reason,accident',
+            'bank_acc_id'  => 'required_if:payment_type,bankTransfer',
         ]);
         if($validator->fails()){
             return $this->sendError($validator->errors()->all() , 400 , 400 );       
         }
         
         $user = Auth::user();
-        $memberNo = $request->mbr_no == null ? $user->mbr_no : $request->mbr_no;
+        $memberNo = $request->mbr_no;
         $payType = $request->payment_type ;
         $presAmt = $request->pres_amt;
         $bankAccId = $request->bank_acc_id;
@@ -93,6 +100,8 @@ class ClaimController extends BaseController
         $docs = $request->docs;
         $pdfBuilder = new Dompdf();
         $pdfBuilder->set_paper('A4', 'portrait');
+
+        $user_claim = MobileUser::where('mbr_no', $request->mbr_no)->first();
         $html = '';
         $combinedDocs = [];
         if($bankAccId != null ){
@@ -281,7 +290,7 @@ class ClaimController extends BaseController
                 'occur_time' => $occurTime,
                 'body_part' => $bodyPart,
                 'incident_detail' => $detail,
-                'note' => $note,
+                'note' => $note ? $note : "none",
                 'dependent_memb_no' => $request->mbr_no,
                 'fullname' => $fullname,
                 'mobile_claim_status_id' => $id_status_new

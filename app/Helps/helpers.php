@@ -9,6 +9,7 @@ use Pusher\Pusher;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use App\Services\Notification\FcmService;
 
 
 function saveImage($file ,$path, $thumbnail=null){
@@ -155,7 +156,7 @@ function setActiveByRoute(string $relative_url, $class = 'active')
 
 function loadImg($imageName = null, $dir = null) {
     if (strlen(strstr($imageName, '.')) > 0) {
-        return $dir . $imageName;
+        return $dir .'/'. $imageName;
     } else {
         return '/img/noimage.png';
     }
@@ -433,16 +434,17 @@ function push_notify_fcm($title , $contents , $mobile_user_id){
     if($MobileDevice == null){
         return false;
     }
-    $deviceTokens = $MobileDevice->pluck('device_token');
-    \App\Jobs\PushNotificationJob::dispatch('sendBatchNotification', [
+    $deviceTokens = $MobileDevice->pluck('device_token')->toArray();
+    $FcmService = new FcmService();
+    $FcmService->sendBatchNotification(
         $deviceTokens,
         [
-            'topicName' => 'Pacific-cross-vn',
+            'topicName' => 'Pacificcrossvn',
             'title' => $title,
             'body' => $contents,
-            'image' => asset('img/logo.png'),
+            
         ],
-    ]);
+    ) ;
     \App\Models\Message::create([
         'user_to' => $mobile_user_id,
         'title'   => $title,
