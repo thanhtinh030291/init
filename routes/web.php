@@ -35,6 +35,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('setting/update','App\Http\Controllers\SettingController@update');
         Route::post('setting/updatePlan','App\Http\Controllers\SettingController@updatePlan');
         Route::post('setting/updateProvider','App\Http\Controllers\SettingController@updateProvider');
+        Route::post('setting/truncate_db_test','App\Http\Controllers\SettingController@truncate_db_test');
+        
 
         //plan hbs
         Route::resource('hbsplan', 'App\Http\Controllers\HbsPlanConfigController');

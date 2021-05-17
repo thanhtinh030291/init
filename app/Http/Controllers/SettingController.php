@@ -193,4 +193,15 @@ class SettingController extends Controller
             ]);
         }
     }
+
+    public function truncate_db_test(Request $request){
+        if($request->password == 'admin'){
+            $tableNames = ['mobile_claim','mobile_claim_file'];
+            foreach ($tableNames as $name) {
+                DB::table($name)->truncate();
+            }
+            $request->session()->flash('status', "setting update success"); 
+            return redirect('/admin/setting');
+        }
+    }
 }
