@@ -35,16 +35,29 @@
 
                         {{ Form::label('mr_no',__('message.pocy_no'), array('class' => 'labelas')) }}
                         {{ Form::text('pocy_no', $data->pocy_no, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'required', 'readonly']) }}<br>
-                    </div>
-                    <div class="col-md-6 p-2">
+
                         {{ Form::label('company',__('message.company'), array('class' => 'labelas')) }}
                         {{ Form::text('company', $data->company, ['class' => 'form-control','placeholder'=>__('message.enter_please'),   'readonly']) }}<br>
+                    </div>
+                    <div class="col-md-6 p-2">
+                        
 
                         {{ Form::label('tel',__('message.tel'), array('class' => 'labelas')) }}
                         {{ Form::text('tel', $data->tel, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
 
                         {{ Form::label('id_card',__('message.id_card'), array('class' => 'labelas')) }}
-                        {{ Form::text('id_card', $data->id_card, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+                        {{ Form::text('id_card', $data->card_id, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+
+                        {{ Form::label('first_login',__('message.first_login'), array('class' => 'labelas')) }}
+                        {{ Form::text('first_login', $data->first_login, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+
+                        {{ Form::label('id_card',__('message.last_login'), array('class' => 'labelas')) }}
+                        {{ Form::text('last_login', $data->last_login, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+
+                        {{ Form::label('id_card',__('message.resrouce'), array('class' => 'labelas')) }}
+                        {{ Form::text('resrouce', $data->resrouce, ['class' => 'form-control','placeholder'=>__('message.enter_please'), 'readonly']) }}<br>
+
+
 
                     </div>
                 </div>
@@ -64,7 +77,7 @@
                             <h5 class="card-header">Notication</h5>
                             <div class="card-body">
                                 <h5 class="card-title">Title</h5>
-                                <input type="text" name="title" class="card-text form-control"/>
+                                <input type="text" name="title" class="card-text form-control" required />
                                 <h5 class="card-title">Contents</h5>
                                 <textarea name="contents" class="card-text form-control"></textarea>
                                 <button type="submit" class="btn btn-primary">Send</button>

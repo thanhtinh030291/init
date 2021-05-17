@@ -102,23 +102,17 @@ class MobileUserController extends Controller
 
     public function notification(Request $request,$id)
     {
-        $MobileDevice = MobileDevice::where('mobile_user_id',$id)->pluck('device_token');
         
-        if($MobileDevice->count() == 0){
+        
+        $rp = push_notify_fcm($request->title , $request->contents , $id);
+        if($rp == false){
             $request->session()->flash(
                 'errorStatus', 
                 'Không tìm thấy divice token'
             );
+            return redirect()->back();
         }
-        PushNotificationJob::dispatch('sendBatchNotification', [
-            [$MobileDevice[0]],
-            [
-                'topicName' => 'Pacific Cross VN',
-                'title' => 'Chúc mứng sinh nhật',
-                'body' => '',
-                
-            ],
-        ]);
+        flash()->success('Send ok');
         return redirect()->back();
     }
 }

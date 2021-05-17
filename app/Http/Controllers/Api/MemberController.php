@@ -35,7 +35,7 @@ class MemberController extends BaseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'email',
             'pocy_no' => 'required',
         ]);
         
@@ -79,7 +79,8 @@ class MemberController extends BaseController
                 'email' => $request->email,
                 'is_policy_holder' => $HbsMember->is_policy_holder,
                 'language' => "_vi",
-                'address' => $HbsMember->address
+                'address' => $HbsMember->address,
+                'resrouce' => "HBS",
             ]);
             $data['contents'] = sprintf(__('frontend.create_mobile_user_message'),$fullname,config('app.name'),$request->email, $password);
             //sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));
@@ -101,7 +102,9 @@ class MemberController extends BaseController
     {
         
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'email|required_without_all:fb_id,gg_id|unique:App\Models\MobileUser,email',
+            'fb_id' => 'required_without_all:email,gg_id|unique:App\Models\MobileUser,fb_id',
+            'gg_id' => 'required_without_all:email,fb_id|unique:App\Models\MobileUser,gg_id',
             'pocy_no' => 'required',
             'photo_front' => 'required',
             'photo_back' => 'required',
@@ -116,10 +119,10 @@ class MemberController extends BaseController
         $fb_id = $request->fb_id;
         $gg_id = $request->gg_id;
         $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->count();
-        
         if($HbsMember == 0){
             return $this->sendError(__('frontend.pocy_not_exist') , 400 ,400);       
         }
+
 
         $body_face_matching = [
             'img1' => $request->photo_front,
@@ -142,7 +145,8 @@ class MemberController extends BaseController
             ]
         ]);
         $mbr_name = null;
-        $dob = null; 
+        $dob = null;
+        $id_card = null;
         
         try {
             // ocr
@@ -154,6 +158,7 @@ class MemberController extends BaseController
                 if(isset($response_ocr->data[1])){
                     $mbr_name = strtoupper(vn_to_str($response_ocr->data[1]->info->name));
                     $dob = $response_ocr->data[1]->info->dob;
+                    $id_card = $response_ocr->data[1]->info->id;
                 }else{
                     return $this->sendError(__("frontend.id_font_requid") , 400 , 400 );
                 }
@@ -221,7 +226,10 @@ class MemberController extends BaseController
             $password = $env = config('app.debug') == false ? Str::random(8) : "123456xx";
             $fullname = $HbsMember->mbr_first_name ? $HbsMember->mbr_first_name ." " : "";
             $fullname = $HbsMember->mbr_mid_name ? $fullname . $HbsMember->mbr_mid_name . " " : $fullname ; 
-            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_last_name . " " : $fullname ; 
+            $fullname = $HbsMember->mbr_last_name ? $fullname . $HbsMember->mbr_last_name . " " : $fullname ;
+            $path = config('constants.photoUpload');
+            $photo_front = saveImageBase64 ($request->photo_front , $path , null);
+            $photo_back = saveImageBase64 ($request->photo_back , $path , null);
             $MobileUser = MobileUser::create([
                 'pocy_no' => $HbsMember->pocy_no,
                 'mbr_no' => $HbsMember->mbr_no,
@@ -233,7 +241,11 @@ class MemberController extends BaseController
                 'language' => "_vi",
                 'address' => $HbsMember->address,
                 'fb_id' => $fb_id,
-                'gg_id' => $gg_id
+                'gg_id' => $gg_id,
+                'card_id' => $id_card,
+                'front_card_url' => $photo_front,
+                'back_card_url' => $photo_back,
+                'resrouce' => "EKYC",
             ]);
             $data['contents'] = sprintf(__('frontend.create_mobile_user_message'),$fullname,config('app.name'),$request->email, $password);
             sendEmail($MobileUser, $data,'templateEmail.noTeamplate', __('frontend.create_mobile_user_subject'));
@@ -273,6 +285,12 @@ class MemberController extends BaseController
         }
         
         if($user != null){
+            if($user->first_login == null){
+                $user->first_login = Carbon::now();
+            }else{
+                $user->last_login = Carbon::now();
+            }
+            $user->save();
             $success['token'] =  $user->createToken('mobile')->accessToken; 
             $success['user'] =  $user;
             return $this->sendResponse($success, __('frontend.logined') , 0 );

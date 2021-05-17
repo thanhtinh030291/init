@@ -87,28 +87,6 @@ function saveFileContent($file_content ,$path ,$ext,$oldFile = null)
     return $fileName;
 }
 
-
-function GetApiMantic($url)
-{
-    $headers = [
-        'Content-Type' => 'application/json',
-        'Authorization' => config('constants.token_mantic'),
-    ];
-    
-    try {
-        $client = new \GuzzleHttp\Client([
-            'headers' => $headers
-        ]);
-        $request = $client->get(config('constants.url_mantic_api').$url);
-        $response = $request->getBody();
-    }catch (GuzzleHttp\Exception\ClientException $e) {
-        $response = $e->getResponse()->getBody(true);
-    }
-    
-    
-    return json_decode($response->getContents(), true);
-}
-
 //truncate string
 
 function truncate($string , $limit = 100){
@@ -128,20 +106,6 @@ function PostApiMantic($url,$body) {
     return $response;
 }
 
-function PostApiManticHasFile($url,$body) {
-    $headers = [
-        'Content-Type' => 'application/json',
-        'Authorization' => config('constants.token_mantic'),
-    ];
-    $client = new \GuzzleHttp\Client([
-            'headers' => $headers
-        ]);
-      
-
-    $response = $client->request("POST", config('constants.url_mantic_api').$url , $body);
-
-    return $response;
-}
 
 function sendEmail($user_send, $data , $template , $subject)
 {
@@ -169,29 +133,6 @@ function sendEmail($user_send, $data , $template , $subject)
     return true;
 }
 
-function sendEmailProvider($user_send, $to_email , $to_name, $subject, $data , $template)
-{
-    if (!data_get($user_send, 'email')) {
-        return false;
-    }
-    $app_name  = config('constants.appName');
-    $app_email = config('constants.appEmail');
-    Mail::send(
-        $template, 
-        [
-            'user' => $user_send, 
-            'data' => isset($data) ?  $data : []
-        ], function ($mail) use ($user_send, $to_email, $to_name, $subject, $app_name, $app_email, $data) {
-            $mail
-                ->to( $to_email)
-                ->cc([$user_send->email])
-                ->replyTo($user_send->email, $user_send->name)
-                ->attachData(base64_decode($data['attachment']['base64']), $data['attachment']['filename'], ['mime' => $data['attachment']['filetype']])
-                ->subject($subject);
-        }
-    );
-    return true;
-}
 // set active value
 function setActive(string $path, $class = 'active') {
     $path = explode('.',$path)[0];
@@ -339,77 +280,6 @@ function dateConvertToString($date = null)
 }
 
 
-function notifi_system($content, $arrUserID = []){
-    $user = User::findOrFail(1);
-    $options = array(
-        'cluster' => config('constants.PUSHER_APP_CLUSTER'),
-        'encrypted' => true
-    );
-    $data['title'] = $user->name . ' gửi tin cho bạn';
-    $data['content'] = $content;
-    $data['avantar'] = config('constants.avantarStorage').'thumbnail/'.$user->avantar;
-    $pusher = new Pusher(
-        config('constants.PUSHER_APP_KEY'),
-        config('constants.PUSHER_APP_SECRET'),
-        config('constants.PUSHER_APP_ID'),
-        $options
-    );
-    $data_messageSent = [];
-    foreach ($arrUserID as $key => $value) {
-        $data_messageSent[] = [
-            'user_to' => $value,
-            'message' => $content
-        ];
-    }
-    $mesage_data = $user->messagesSent()->createMany($data_messageSent);
-    foreach ($arrUserID as $key => $value) {
-        $pusher->trigger('NotifyUser-'.$value,'Notify' ,$data);
-    }
-    
-    $user_to = User::whereIn('id', $arrUserID)->get();
-    foreach ($user_to as $key => $value) {
-        $value->notify(new PushNotification(
-            $data['title'] , 
-            $data['content'] , 
-            $data['avantar'] , 
-            url('admin/message')
-        ));
-    }
-    
-    return redirect('/admin/home/');
-}
-
-
-// Get token CPS
-function getTokenCPS(){
-    $headers = [
-        'Content-Type' => 'application/json',
-    ];
-    $body = [
-        'client_id' => config('constants.client_id'),
-        'client_secret' => config('constants.client_secret'),
-        'grant_type' => config('constants.grant_type'),
-    ];
-    $setting = Setting::where('id', 1)->first();
-    if($setting === null){
-        $setting = Setting::create([]);
-    }
-    $startTime = Carbon\Carbon::parse($setting->updated_at);
-    $now = Carbon\Carbon::now();
-    $totalDuration = $startTime->diffInSeconds($now);
-    if($setting->token_cps == null || $totalDuration >= 3500){
-        $client = new \GuzzleHttp\Client([
-            'headers' => $headers
-        ]);
-        $response = $client->request("POST", config('constants.api_cps').'get_token' , ['form_params'=>$body]);
-        $response =  json_decode($response->getBody()->getContents());
-        $setting->token_cps = data_get($response , 'access_token');
-        $setting->save();
-    }
-    return  $setting->token_cps;
-}
-
-
 
 function numberToRomanRepresentation($string) {
     $chars = preg_split('//', $string, -1, PREG_SPLIT_NO_EMPTY);
@@ -440,39 +310,6 @@ function formatVN($string)
 {
     $pattern  = '/[^a-z0-9A-Z_[:space:]ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂ ưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/u';
     return preg_replace($pattern, "", $string);;
-}
-
-function getTokenMfile(){
-    $headers = [
-        'Content-Type' => 'application/json',
-    ];
-    $body = [
-        'email' => config('constants.account_mfile'),
-        'password' => config('constants.pass_mfile')
-    ];
-    $setting = Setting::where('id', 1)->first();
-    if($setting === null){
-        $setting = Setting::create([]);
-    }
-    
-    $startTime = Carbon\Carbon::parse($setting->updated_token_mfile_at);
-    $now = Carbon\Carbon::now();
-    $totalDuration = $startTime->diffInSeconds($now);
-    
-    if($setting->token_mfile == null || $totalDuration >= 3500){
-        $client = new \GuzzleHttp\Client([
-            'headers' => $headers
-        ]);
-        
-        $response = $client->request("POST", config('constants.link_mfile').'login' , ['form_params'=>$body]);
-        $response =  json_decode($response->getBody()->getContents());
-        Setting::where('id', 1)->update([
-            'token_mfile' => data_get($response , 'token'),
-            'updated_token_mfile_at' => Carbon\Carbon::now()->toDateTimeString()
-        ]);
-        
-    }
-    return  $setting->token_mfile;
 }
 
 function hashpass($data, $recursive = 2)
@@ -589,4 +426,27 @@ function mine_to_ext($str){
 function get_path_upload(){
     $dirk = Carbon::now()->format('m_Y');
     return config('constants.srcUpload').$dirk."/";
+}
+
+function push_notify_fcm($title , $contents , $mobile_user_id){
+    $MobileDevice = \App\Models\MobileDevice::select('device_token','updated_at')->where('mobile_user_id', $mobile_user_id)->orderBy('updated_at','DESC')->get();
+    if($MobileDevice == null){
+        return false;
+    }
+    $deviceTokens = $MobileDevice->pluck('device_token');
+    \App\Jobs\PushNotificationJob::dispatch('sendBatchNotification', [
+        $deviceTokens,
+        [
+            'topicName' => 'Pacific-cross-vn',
+            'title' => $title,
+            'body' => $contents,
+            'image' => asset('img/logo.png'),
+        ],
+    ]);
+    \App\Models\Message::create([
+        'user_to' => $mobile_user_id,
+        'title'   => $title,
+        'message' => $contents
+    ]);
+    return true;
 }

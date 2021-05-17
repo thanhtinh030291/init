@@ -170,5 +170,8 @@ return [
     'id_card' => 'Id Card',
     'front_card_url' => 'Front Of Card',
     'back_card_url' => 'Back Of Card',
-    'file' => 'Attachment'
+    'file' => 'Attachment',
+    'first_login' => 'First login at',
+    'last_login' => 'Last login at',
+    'resrouce' => 'Resource',
 ];
