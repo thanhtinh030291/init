@@ -17,7 +17,7 @@ class CreateProviderTable extends Migration
             $table->id();
             $table->string('code','10')->nullable();
             $table->string('name',255)->collation('utf8_unicode_ci')->nullable();
-            $table->string('phone',20)->collation('utf8_unicode_ci')->nullable();
+            $table->string('phone',255)->collation('utf8_unicode_ci')->nullable();
             $table->string('email',255)->collation('utf8_unicode_ci')->nullable();
             $table->string('website',255)->collation('utf8_unicode_ci')->nullable();
             $table->string('address',255)->collation('utf8_unicode_ci')->nullable();
@@ -41,6 +41,7 @@ class CreateProviderTable extends Migration
             $table->string('medical_services',255)->collation('utf8_unicode_ci')->nullable();
             $table->string('price_from',20)->collation('utf8_unicode_ci')->nullable();
             $table->string('price_to',20)->collation('utf8_unicode_ci')->nullable();
+            $table->string('lang',20)->collation('utf8_unicode_ci')->nullable();
             $table->timestamps();
         });
     }

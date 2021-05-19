@@ -117,7 +117,7 @@ class SettingController extends Controller
             SELECT * FROM (
                 SELECT
                     id AS `code`,
-                    title AS `name`,
+                    title AS `name_provider`,
                     MAX(IF(name = 'providerPhone', value, NULL)) AS `phone`,
                     MAX(IF(name = 'providerEmail', value, NULL)) AS `email`,
                     MAX(IF(name = 'providerWebsite', value, NULL)) AS `website`,
@@ -142,14 +142,16 @@ class SettingController extends Controller
                     MAX(IF(name = 'MedicalType', value, NULL)) AS `medical_type`,
                     MAX(IF(name = 'providerMedicalServices', value, NULL)) AS `medical_services`,
                     MAX(IF(name = 'providersPriceFrom', value, NULL)) AS `price_from`,
-                    MAX(IF(name = 'providersPriceTo', value, NULL)) AS `price_to`
+                    MAX(IF(name = 'providersPriceTo', value, NULL)) AS `price_to`,
+                    lang
                 FROM (
                     SELECT
                         item.id,
                         item.title,
                         fd.name,
                         fd.label,
-                        rel.value
+                        rel.value,
+                        SUBSTRING_INDEX(item.language, '-', 1) as lang
                     FROM `gd68j_flexicontent_items_tmp` item
                         JOIN `gd68j_flexicontent_fields_item_relations` rel
                         ON item.id = rel.`item_id`
@@ -165,6 +167,7 @@ class SettingController extends Controller
             Provider::updateOrCreate([
                 'code'   => $row->code,
             ],[
+                'name'           => $row->name_provider,
                 'phone'          => $row->phone,
                 'email'          => $row->email,
                 'website'        => $row->website,
@@ -190,6 +193,7 @@ class SettingController extends Controller
                 'medical_services'          => $row->medical_services,
                 'price_from'                => $row->price_from,
                 'price_to'                  => $row->price_to,
+                'lang'                      => $row->lang
             ]);
         }
     }

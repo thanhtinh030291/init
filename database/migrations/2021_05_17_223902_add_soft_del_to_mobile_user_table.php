@@ -26,7 +26,7 @@ class AddSoftDelToMobileUserTable extends Migration
     public function down()
     {
         Schema::table('mobile_user', function (Blueprint $table) {
-            //
+            $table->dropColumn('deleted_at');
         });
     }
 }

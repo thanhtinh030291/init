@@ -48,6 +48,16 @@
                         </div>
                     </div>
                 {{ Form::close() }}
+                {{ Form::open(array('url' => '/admin/mobileclaim/notification/'.$data->id, 'method'=>'post', 'id' => 'frmUpdateStaff', 'files' => true))}}
+                    <h5 class="card-header">Notication</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">Title</h5>
+                        <input type="text" name="title" class="card-text form-control" required />
+                        <h5 class="card-title">Contents</h5>
+                        <textarea name="contents" class="card-text form-control"></textarea>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                {{ Form::close() }}
             </div>
         </div>
     </div>

@@ -32,7 +32,8 @@ class ClaimController extends BaseController
     public function issues()
     {
         $user = Auth::user();
-        $issues = MobileClaim::select('mobile_claim.id','name','name_vi', 'code','note','mantis_id')->join('mobile_claim_status', 'mobile_claim_status.id', '=', 'mobile_claim_status_id')
+        $issues = MobileClaim::select('mobile_claim.id','name','name_vi', 'code','note','mantis_id','mobile_claim.updated_at','is_read')->join('mobile_claim_status', 'mobile_claim_status.id', '=', 'mobile_claim_status_id')
+            ->orderBy('mobile_claim.updated_at','DESC')
             ->where('mobile_user_id', $user->id)
             ->get()->toArray();
         return $this->sendResponse($issues, 'OK', 0); 
@@ -46,12 +47,14 @@ class ClaimController extends BaseController
     public function issue($id)
     {
         $user = Auth::user();
-        $claim = MobileClaim::join('mobile_claim_status', 'mobile_claim_status.id', '=', 'mobile_claim_status_id')
+        $claim = MobileClaim::select('mobile_claim.*','name','name_vi','code')->join('mobile_claim_status', 'mobile_claim_status.id', '=', 'mobile_claim_status_id')
             ->where('mobile_claim.id', $id)
             ->first();
         if($claim == null){
             return $this->sendError(__('frontend.not_found'), 404, 404); 
         }
+        $claim->is_read = 1;
+        $claim->save();
         $dateCreate = new \DateTime($claim->created_at);
         $now = new \DateTime();
         $dteDiff  = $dateCreate->diff($now);
@@ -59,7 +62,7 @@ class ClaimController extends BaseController
         $claim['ranger_time'] = $hoursDiff;
         $claim['accept_add_sub'] = $hoursDiff <= 48 ? true : false; 
         $claim['extra'] = json_decode($claim['extra'],true);
-        return $this->sendResponse($claim, 'OK', 0); 
+        return $this->sendResponse($claim, 'OK', 0);
     }
 
     /**
@@ -80,6 +83,7 @@ class ClaimController extends BaseController
             'incident_detail' => 'required_if:reason,accident',
             'body_part' => 'required_if:reason,accident',
             'bank_acc_id'  => 'required_if:payment_type,bankTransfer',
+            'fullname' => 'required',
         ]);
         if($validator->fails()){
             return $this->sendError($validator->errors()->all() , 400 , 400 );       
@@ -95,7 +99,7 @@ class ClaimController extends BaseController
         $occurTime = $request->occur_time;
         $bodyPart = $request->body_part;
         $detail = $request->incident_detail;
-        $note =  $request->note;
+        $note =  $request->note != null ? $request->note : 'none';
         $fullname = $request->fullname;
         $docs = $request->docs;
         $pdfBuilder = new Dompdf();
@@ -278,7 +282,7 @@ class ClaimController extends BaseController
         try {
             DB::beginTransaction();
             $id_status_new = MobileClaimStatus::where('code',10)->first()->id;
-            $claim = MobileClaim::create([
+            $data_save = [
                 'crt_by' => $user->id,
                 'mantis_id' => 0,
                 'mobile_user_id' => $user->id,
@@ -290,11 +294,22 @@ class ClaimController extends BaseController
                 'occur_time' => $occurTime,
                 'body_part' => $bodyPart,
                 'incident_detail' => $detail,
-                'note' => $note ? $note : "none",
+                'note' => $note ,
                 'dependent_memb_no' => $request->mbr_no,
                 'fullname' => $fullname,
-                'mobile_claim_status_id' => $id_status_new
-            ]);
+                'mobile_claim_status_id' => $id_status_new,
+                'mbr_no' => $memberNo,
+                'pocy_no' => $user->pocy_no,
+                'company' => $user->company,
+            ];
+            if (!is_null($bankAccId))
+            {
+                $data_save['bank_acc_name'] = $MobileUserBankAccount->bank_acc_name;
+                $data_save['bank_acc_no'] = $MobileUserBankAccount->bank_acc_no;
+                $data_save['bank_name'] = $MobileUserBankAccount->bank_name;
+                $data_save['bank_address'] = $MobileUserBankAccount->bank_address;
+            }
+            $claim = MobileClaim::create($data_save);
             $claim->mobile_claim_file()->createMany($filenames);
             $files = [];
             foreach ($combinedDocs as $doc)
@@ -304,10 +319,11 @@ class ClaimController extends BaseController
                     'content' => $doc['contents']
                 ];
             }
+            
             $data_up_mantis = [
                 'pocy_no' => $user->pocy_no,
-                'mbr_no' => $dependentMbrNo ?? $user->mbr_no,
-                'fullname' => $fullname ?? $user->fullname,
+                'mbr_no' => $request->mbr_no,
+                'fullname' => $fullname != null ? $fullname : $user->fullname,
                 'note' => $note,
                 'files' => $files,
                 'pay_type' => $payType,
@@ -352,9 +368,8 @@ class ClaimController extends BaseController
      */
     public function note_create(Request $request,$id){
         $validator = Validator::make($request->all(), [
-            'docs' => 'required',
-            'mbr_no' => 'required',
-            'note' => 'required'
+            'docs' => 'required_without_all:note',
+            'note' => 'required_without_all:docs'
         ]);
         if($validator->fails()){
             return $this->sendError($validator->errors()->all() , 400 , 400 );       
@@ -369,40 +384,46 @@ class ClaimController extends BaseController
         $path = get_path_upload();
         $filenames = [];
         $html = null;
-        foreach ($docs as $id => $doc)
-        {
-            if ($doc['filetype'] === 'application/pdf')
+        $docs = $request->docs;
+        $note = $request->note;
+        if(!empty($docs)){
+            foreach ($docs as $id => $doc)
             {
-                $combinedDocs[]=$docs[$id];
+                if ($doc['filetype'] === 'application/pdf')
+                {
+                    $combinedDocs[]=$docs[$id];
+                }
+                else
+                {
+                    $img = '
+                        <img
+                            style="max-width:100%;"
+                            src="data:' . $doc['filetype'] . ';base64,' . $doc['contents'] . '"
+                        />
+                    ';
+                    $html .= $img;
+                }
+                $filenames[] = [
+                    'url' => saveImageBase64($doc['contents'],$path),
+                    'disk' => $dirk,
+                    'note' => 1,
+                ];
             }
-            else
-            {
-                $img = '
-                    <img
-                        style="max-width:100%;"
-                        src="data:' . $doc['filetype'] . ';base64,' . $doc['contents'] . '"
-                    />
-                ';
-                $html .= $img;
+            if($html != null){
+                $pdfBuilder = new Dompdf();
+                $pdfBuilder->set_paper('A4', 'portrait');
+                $pdfBuilder->load_html($html);
+                $pdfBuilder->render();
+                $pdf = $pdfBuilder->output();
+                $fileContents = base64_encode($pdf);
+                $filesize = strlen($fileContents);
+                $combinedDocs[] = [
+                    'filetype' => 'application/pdf',
+                    'filesize' => $filesize,
+                    'filename' => 'user_upload_' . time() . ".pdf",
+                    'contents' => $fileContents
+                ];
             }
-            $filenames[] = [
-                'url' => saveImageBase64($doc['contents'],$path),
-                'disk' => $dirk,
-                'note' => 1,
-            ];
-        }
-        if($html != null){
-            $pdfBuilder->load_html($html);
-            $pdfBuilder->render();
-            $pdf = $pdfBuilder->output();
-            $fileContents = base64_encode($pdf);
-            $filesize = strlen($fileContents);
-            $combinedDocs[] = [
-                'filetype' => 'application/pdf',
-                'filesize' => $filesize,
-                'filename' => 'user_upload_' . time() . ".pdf",
-                'contents' => $fileContents
-            ];
         }
         $note = $request->note ? $request->note : " none ";
 
@@ -411,13 +432,15 @@ class ClaimController extends BaseController
             $claim->mobile_claim_file()->createMany($filenames);
             $files = [];
             $filename = [];
-            foreach ($combinedDocs as $doc)
-            {
-                $files[] = [
-                    'name' => $doc['filename'],
-                    'content' => $doc['contents']
-                ];
-                $filename[]=$doc['filename'];
+            if(!empty($docs)){
+                foreach ($combinedDocs as $doc)
+                {
+                    $files[] = [
+                        'name' => $doc['filename'],
+                        'content' => $doc['contents']
+                    ];
+                    $filename[]=$doc['filename'];
+                }
             }
             $status = MobileClaimStatus::where('code',17)->first();
             $issue = json_decode($claim->extra, true);
@@ -440,7 +463,6 @@ class ClaimController extends BaseController
                 'note' => $note,
                 'files' => $files,
             ];
-            
             $headers = [
                 'Content-Type' => 'application/json',
                 'Authorization' => config('constants.PCV_ETALK_API_TOKEN'),
@@ -449,9 +471,58 @@ class ClaimController extends BaseController
                     'headers' => $headers
                 ]);
             
-            $response = $client->request("POST", config('constants.PCV_ETALK_API_URL').'/mobile-claim/add-note/'.{$claim->mantis_id}, ['form_params'=>$data_up_mantis]);
+            $response = $client->request("POST", config('constants.PCV_ETALK_API_URL').'/mobile-claim/add-note/'.$claim->mantis_id, ['form_params'=>$data_up_mantis]);
             $res = json_decode($response->getBody(),true);
             $claim->save();
+            DB::commit();
+            return $this->sendResponse($claim , __('frontend.note_added') , 0);
+        } catch (Exception $e) {
+            Log::error(generateLogMsg($e));
+            DB::rollback();
+            return $this->sendError(__('frontend.internal_server_error'), 500 );
+        }
+    }
+
+    /**
+     * Post a Note of a mobile user
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function update_status(Request $request,$id){
+        $validator = Validator::make($request->all(), [
+            'status' => 'required'
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+       $mantis_id = $id;
+       $company = $request->company ? $request->company : 'pcv';
+       $status_code = $request->status;
+       $claim  =  MobileClaim::where('mantis_id', $mantis_id)->where('company', $company)->first();
+       if($claim == null ){
+            return $this->sendError( __('frontend.claim_not_exist'), 400 , 400 );
+       }
+       $status = MobileClaimStatus::where('code', $status_code)->first();
+       if($claim == null ){
+                return $this->sendError( __('frontend.status_not_exist'), 400 , 400 );
+        }
+       $issue = json_decode($claim->extra, true);
+       $issue['notes'] = $notes;
+       $issue['status'] = [
+        'id' => $status->id,
+        'code' => $status->code,
+        'name' => $status->name,
+        'name_en' => $status->name,
+        'name_vi' => $status->name_vi
+       ];
+        try {
+            DB::beginTransaction();
+            $claim->mobile_claim_status_id = $status->id;
+            $claim->extra = json_encode($issue);
+            $claim->is_read = 0;
+            $claim->save();
+
+            push_notify_fcm(__('frontend.update_claim_status_title') , $request->note , $claim->mobile_user_id);
             DB::commit();
             return $this->sendResponse($claim , __('frontend.note_added') , 0);
         } catch (Exception $e) {

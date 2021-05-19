@@ -63,8 +63,10 @@ function getImageBase64 ($path){
 
     $uri = storage_path("app".$path); 
     $type = pathinfo($uri, PATHINFO_EXTENSION);
+
     $data = file_get_contents($uri);
-    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    $type = mime_content_type(storage_path("app".$path));
+    $base64 = 'data:' . $type . ';base64,' . base64_encode($data);
     return  $base64;
 }
 

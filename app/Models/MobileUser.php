@@ -37,23 +37,7 @@ class MobileUser extends Authenticatable
         'password'
     ];
 
-    /**
-     * Overwrite method delete of query builder
-     * 
-     * @return $query
-     */
-    protected function runSoftDelete()
-    {
-        $query = $this->newQuery()->where($this->getKeyName(), $this->getKey());
-
-        $is_deleted = 1;
-        $query->update(
-            [
-                $this->getDeletedAtColumn() => date("Y-m-d H:i:s"),
-                'is_deleted'                => $is_deleted
-            ]
-        );
-    }
+    
 
     public function validateForPassportPasswordGrant($password)
     {

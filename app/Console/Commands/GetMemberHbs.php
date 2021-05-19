@@ -44,32 +44,33 @@ class GetMemberHbs extends Command
     {
         dump("JoBName : Get Member Hbs");
         dump("-------------Start : " . Carbon::now());
-        $url_file = resource_path('sql/import_pcv_member.sql');
-        $sql =  file_get_contents($url_file);
+        
         $arr = [
             'hbs_pcv' => 'pcv',
-            //'hbs_bsh' => 'bsh'
+            'hbs_bsh' => 'bsh'
         ];
         DB:: table('hbs_member')->truncate();
         foreach ($arr as $key => $value) {
-            $HbsMember = DB::connection($key)->select($sql,[$value]);
+            $url_file = resource_path("sql/import_{$value}_member.sql");
+            $sql =  file_get_contents($url_file);
+            $HbsMember = DB::connection($key)->select($sql, [$value]);
             $i = 0;
             dump("sss");
             $collection = json_decode(json_encode($HbsMember), true);
             dump("ssss");
-            $chunks = array_chunk($collection,500);
+            $chunks = array_chunk($collection, 1000);
             try {
                 DB::beginTransaction();
                 foreach ($chunks as $key2 => $value2) {
                     $num_row = count($value2);
                     DB::table('hbs_member')->insert($value2);
-                    dump("Success Time: " .$i. "..".$value."..: ".$num_row);
+                    dump("Success Time: $i..$value..: $num_row");
                     $i++;
                 }
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollback();
-                dump("Failed Time: " .$i. "..".$value."..:");
+                dump("Failed Time: $i..$value..: $e");
             }
         }
         

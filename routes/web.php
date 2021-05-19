@@ -47,6 +47,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         //moblie Claim
         Route::resource('mobileclaim', 'App\Http\Controllers\MobileClaimController');
+        Route::post('mobileclaim/notification/{id}', 'App\Http\Controllers\MobileClaimController@notification');
     });
 });
 

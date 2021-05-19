@@ -51,7 +51,7 @@ class MemberController extends BaseController
 
         $HbsMember = HbsMember::select('mbr_no','company')->where('pocy_no', $request->pocy_no)->where('email', $request->email)->distinct()->get();
         if($HbsMember->count() != 1){
-            return $this->sendError('Please use eKYC', 10 , 200 );       
+            return $this->sendError('Please use Ekyc', 10 , 200 );       
         }
 
         $MobileUser = MobileUser::where('mbr_no', $HbsMember[0]->mbr_no )->orWhere('email', $request->email)->count();
@@ -268,7 +268,7 @@ class MemberController extends BaseController
     {
         //valid parameter 
         $validator = Validator::make($request->all(), [
-            'email' => 'email|required_without_all:fb_id,gg_id',
+            'email' => 'nullable|email|required_without_all:fb_id,gg_id',
             'password' => 'required_with:email',
             'fb_id' => 'required_without_all:email,gg_id',
             'gg_id' => 'required_without_all:email,fb_id'
@@ -281,8 +281,15 @@ class MemberController extends BaseController
             $user = MobileUser::where('email', $request->email)->where('password', hashpass($request->password))->first();
         }elseif($request->fb_id != null){
             $user = MobileUser::where('fb_id', $request->fb_id)->first();
+            
+            if($user == null){
+                return $this->sendError('please use Ekyc' , 10 , 400 );  
+            }
         }else{
             $user = MobileUser::where('gg_id', $request->gg_id)->first();
+            if($user == null){
+                return $this->sendError('please use Ekyc' , 10 , 400 );  
+            }
         }
         
         if($user != null){
@@ -674,6 +681,24 @@ class MemberController extends BaseController
         return $this->sendResponse( [], 'ok' , 0);
     }
 
+    /**
+     *  device
+     *  Put
+     * @return \Illuminate\Http\Response
+     */
+    public function can_register(Request $request){
+        $validator = Validator::make($request->all(), [
+            'fb_id' => 'required_without:gg_id|unique:App\Models\MobileUser,fb_id',
+            'gg_id' => 'required_without:fb_id|unique:App\Models\MobileUser,gg_id'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+        return $this->sendResponse( [], 'Please use ekyc' , 10);
+        
+    }
+
     private function getInfo($mbr_no, $company){
         $HbsMember = HbsMember::where('mbr_no',$mbr_no)->where('company',$company)->get()->toArray();
         if(empty($HbsMember)){
@@ -777,4 +802,36 @@ class MemberController extends BaseController
         return $years;
     }
 
+    /**
+     * Post check_policy
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function check_policy(Request $request){
+        $validator = Validator::make($request->all(), [
+            'pocy_no' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError($validator->errors()->all() , 400 , 400 );       
+        }
+
+        $HbsMember = HbsMember::where('pocy_no', $request->pocy_no)->count();
+        if($HbsMember == 0){
+            return $this->sendError(__('frontend.pocy_not_exist') , 400 ,400);       
+        }
+        return $this->sendResponse( [], 'Please use ekyc' , 10);
+    }
+
+
+    public function benefit_download($id){
+        $PlanHbsConfig = PlanHbsConfig::findOrFail($id);
+        $lang = App::currentLocale();
+        $filename = data_get($PlanHbsConfig,'filename_'.$lang,null);
+        if( $filename == null ){
+            return $this->sendError('Not exit File' , 400 ,400);
+        }
+        $base64 = getImageBase64( config('constants.srcUpload')."/".$filename);
+        return $this->sendResponse( $base64, 'Ok' , 0);
+    }
 }

@@ -129,4 +129,23 @@ class MobileClaimController extends Controller
         }
         return redirect()->back();
     }
+
+    public function notification(Request $request,$id)
+    {
+        
+        $data = MobileClaim::findOrFail($id);
+        $data->is_read = 0;
+        $data->save();
+        $rp = push_notify_fcm($request->title , $request->contents , $data->mobile_user_id);
+
+        if($rp == false){
+            $request->session()->flash(
+                'errorStatus', 
+                'Không tìm thấy divice token'
+            );
+            return redirect()->back();
+        }
+        flash()->success('Send ok');
+        return redirect()->back();
+    }
 }

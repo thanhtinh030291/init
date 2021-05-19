@@ -13,7 +13,7 @@
             <div class="info-box-content">
             <span class="info-box-text">CPU Traffic</span>
             <span class="info-box-number">
-                {{ data_get($load,0,"...") }}
+                ...
                 <small>%</small>
             </span>
             </div>
